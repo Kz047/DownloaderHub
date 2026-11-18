@@ -152,4 +152,6 @@ pm2 save
 ## <img src="https://api.iconify.design/lucide/scale.svg?color=%233b82f6" width="20" height="20" align="absmiddle" /> License & Credits
 
 * **License:** Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See the [LICENSE](LICENSE) file for full terms.
-* **Acknowledgments:** Built upon foundational open-source work originally created by [budijoi](https://github.com/budijoi) under the MIT License.
+* **Foundational Code:** Built upon open-source work originally created by [budijoi](https://github.com/budijoi) under the MIT License.
+* **Web Server Media Engine:** Powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp) and [FFmpeg](https://ffmpeg.org/) for media extraction, stream merging, and audio conversion.
+* **Android Media Engine:** Powered by [youtubedl-android](https://github.com/yausername/youtubedl-android) by [yausername](https://github.com/yausername) (`youtubedl-android` and `ffmpeg` Android libraries) for native on-device downloading and muxing.
