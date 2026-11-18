@@ -1,0 +1,2332 @@
+/* Nunito (open source, SIL OFL): the file lives in assets/fonts/. An installed copy is the backup. */
+@font-face {
+  font-family: 'Nunito'; font-style: normal; font-weight: 200 1000; font-display: swap;
+  src: url('fonts/Nunito-VariableFont_wght.ttf') format('truetype'), local('Nunito');
+}
+
+  :root {
+    --bg-base: #0c0e12;
+    --sidebar-bg: #070709;
+    --bg-surface: #14161b;
+    --bg-elevated: #1f232b;
+    --accent: #1cb5a2;
+    --text-main: #f4f4f5;
+    --text-muted: #94a3b8;
+    --border: rgba(255, 255, 255, 0.06);
+    --radius: 14px;
+    --font: 'Nunito', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font); }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  @keyframes quirkyLeft {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px) rotate(-6deg); }
+    50% { transform: translateX(2px) rotate(4deg); }
+    75% { transform: translateX(-2px) rotate(-2deg); }
+  }
+
+  @keyframes quirkyRight {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(4px) rotate(6deg); }
+    50% { transform: translateX(-2px) rotate(-4deg); }
+    75% { transform: translateX(2px) rotate(2deg); }
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spinCd { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-elevated) 50%, var(--bg-surface) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+
+  .sidebar-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 45;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: none;
+  }
+  .sidebar-backdrop.active { opacity: 1; pointer-events: auto; }
+
+  .sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    gap: 32px;
+    z-index: 50;
+    transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, background-color 0.3s ease;
+  }
+
+  body.sidebar-collapsed .sidebar {
+    margin-left: -250px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .brand-header {
+    display: flex; align-items: center; justify-content: space-between; padding: 0 4px;
+  }
+
+  .brand-title {
+    display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 700; color: var(--text-main);
+  }
+
+  .brand-logo-box {
+    width: 36px; height: 36px; background: var(--accent); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; color: #000;
+  }
+  .brand-logo-box svg { width: 20px; height: 20px; }
+
+  .collapse-btn {
+    background: transparent; border: none; color: var(--text-muted);
+    cursor: pointer; padding: 6px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .collapse-btn:hover {
+      color: var(--accent); background: rgba(28, 181, 162, 0.15);
+      animation: quirkyLeft 0.4s ease-in-out;
+    }
+  }
+
+  .nav-group { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 16px; padding: 12px 16px;
+    border-radius: 12px; border: none; background: transparent;
+    color: var(--text-muted); font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: 0.2s; text-align: left; width: 100%;
+    position: relative; overflow: hidden;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-item:hover:not(.active) { color: var(--text-main); background: rgba(255, 255, 255, 0.03); }
+  }
+
+  .nav-item.active {
+    background: rgba(28, 181, 162, 0.12);
+    color: var(--accent);
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+  .nav-item.active svg { color: var(--accent); }
+  .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  .show-sidebar-btn {
+    position: fixed; top: max(18px, env(safe-area-inset-top)); left: 16px; z-index: 60;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    color: var(--text-muted); width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    opacity: 0; pointer-events: none; transform: translateX(-30px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  body.sidebar-collapsed .show-sidebar-btn {
+    opacity: 1; pointer-events: auto; transform: translateX(0);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .show-sidebar-btn:hover {
+      color: var(--accent); border-color: var(--accent); background: rgba(28, 181, 162, 0.15);
+      animation: quirkyRight 0.4s ease-in-out;
+    }
+  }
+
+  .main-view {
+    flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden;
+    background-color: var(--bg-base);
+    transition: background-color 0.3s ease;
+  }
+
+  .top-header {
+    padding: max(24px, env(safe-area-inset-top)) 40px 24px 40px; display: flex; flex-direction: column; gap: 16px;
+    border-bottom: 1px solid var(--border); background: var(--bg-base);
+    transition: padding-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+  }
+  body.sidebar-collapsed .top-header { padding-left: 70px; }
+
+  .search-wrapper { display: flex; gap: 12px; align-items: center; width: 100%; }
+
+  .search-box {
+    flex: 1; max-width: min(90vw, 1100px); display: flex; align-items: center;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: 30px; padding: 10px 18px; transition: all 0.3s ease;
+  }
+  .search-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(28, 181, 162, 0.15);
+  }
+  .search-box > svg { color: var(--text-muted); width: 18px; height: 18px; margin-right: 12px; flex-shrink: 0; }
+  .search-box input {
+    flex: 1; background: transparent; border: none; color: var(--text-main);
+    font-size: 14px; outline: none; min-width: 0;
+  }
+
+  .quick-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .qa-btn {
+    background: transparent; border: none; color: var(--text-muted);
+    cursor: pointer; width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .qa-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.08); }
+  }
+  .qa-btn:active { transform: scale(0.9); }
+
+  .platform-filters { display: flex; gap: 8px; flex-wrap: wrap; overflow-x: auto; padding-bottom: 4px; }
+  .platform-filters::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border);
+    cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .filter-chip:hover { color: var(--text-main); border-color: rgba(255,255,255,0.15); }
+  }
+  .filter-chip.active {
+    background: rgba(28, 181, 162, 0.15);
+    color: var(--accent);
+    border-color: rgba(28, 181, 162, 0.4);
+    font-weight: 600;
+  }
+
+  .content-area {
+    flex: 1; overflow-y: auto; padding: 40px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding-bottom: 180px;
+  }
+
+  .empty-state { width: 100%; max-width: min(85vw, 750px); display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+  .empty-hero-card {
+    width: 100%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    transition: background-color 0.3s ease;
+  }
+  .empty-hero-card h2 { font-size: 24px; color: var(--text-main); margin-bottom: 8px; font-weight: 700; }
+  .empty-hero-card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+  .empty-preview-grid {
+    display: flex; gap: 10px; justify-content: center; opacity: 0.5; pointer-events: none; width: 100%;
+  }
+  .skeleton-chip {
+    padding: 8px 16px; background: var(--bg-elevated); border: 1px dashed var(--border);
+    border-radius: 20px; font-size: 12px; color: var(--text-muted); font-weight: 500;
+  }
+
+  .music-view { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding: 40px; padding-bottom: 180px; animation: fadeIn 0.3s ease; }
+  .music-header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; max-width: 1100px; width: 100%; margin-left: auto; margin-right: auto; }
+  .music-header h1 { font-size: 28px; font-weight: 700; color: var(--text-main); margin: 0; }
+  .music-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+  .track-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .track-card:hover { background: var(--bg-elevated); border-color: rgba(255,255,255,0.15); transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+  }
+
+  .track-art-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+
+  .track-art-wrapper {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: border-radius 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    will-change: transform;
+  }
+  .track-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .track-card.playing .track-art-wrapper {
+    border-radius: 50% !important;
+    animation: spinCd 4s linear infinite;
+    border: 4px solid #1a1a1a;
+    background: radial-gradient(circle, #222 30%, #000 70%);
+    box-shadow: 0 0 15px rgba(28, 181, 162, 0.4);
+  }
+
+  .track-card.playing .track-art-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px; height: 24px;
+    background: var(--bg-base);
+    border: 4px solid var(--accent);
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.9);
+    pointer-events: none;
+  }
+
+  .track-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .track-card:hover .track-overlay { opacity: 1; }
+  }
+
+  .track-play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    padding-left: 3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .track-play-btn:hover { transform: scale(1.1); }
+  }
+
+  .track-info { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+  .track-title { font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-artist { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .settings-view {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease;
+  }
+  .settings-title {
+    font-size: 28px; font-weight: 700; color: var(--text-main); margin-bottom: 24px;
+  }
+
+  .settings-search-box {
+    display: flex; align-items: center; background: var(--bg-surface);
+    border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px;
+    margin-bottom: 24px; transition: 0.2s;
+  }
+  .settings-search-box:focus-within { border-color: var(--accent); }
+  .settings-search-box svg { color: var(--text-muted); width: 18px; height: 18px; margin-right: 12px; }
+  .settings-search-box input {
+    background: transparent; border: none; color: var(--text-main); font-size: 14px; outline: none; width: 100%;
+  }
+
+  .settings-tabs {
+    display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 32px; padding-bottom: 2px; overflow-x: auto;
+  }
+  .settings-tab {
+    background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: 600;
+    padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .settings-tab:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+  }
+  .settings-tab.active { color: var(--accent); background: rgba(28, 181, 162, 0.1); }
+
+  .setting-group-title {
+    font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+  }
+  .setting-desc {
+    font-size: 13px; color: var(--text-muted); margin-bottom: 16px;
+  }
+
+  .theme-pills {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px;
+  }
+  .theme-pill {
+    background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted);
+    padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .theme-pill:hover { border-color: rgba(255,255,255,0.2); color: var(--text-main); }
+  }
+  .theme-pill.active { background: rgba(28, 181, 162, 0.15); border-color: var(--accent); color: var(--accent); }
+
+  .history-view {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease;
+  }
+  .history-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+  }
+  .history-clear-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+    padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .history-clear-btn:hover { border-color: #ef4444; color: #ef4444; }
+  }
+
+  .history-empty {
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 60px 20px; color: var(--text-muted);
+  }
+  .history-empty svg { width: 40px; height: 40px; margin-bottom: 16px; opacity: 0.5; }
+  .history-empty p { font-size: 14px; }
+
+  .history-list { display: flex; flex-direction: column; gap: 10px; }
+  .history-item {
+    display: flex; align-items: center; gap: 14px; padding: 12px; background: var(--bg-surface);
+    border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .history-item:hover { border-color: var(--accent); background: var(--bg-elevated); }
+  }
+  .history-thumb { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: #000; flex-shrink: 0; }
+  .history-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .history-title { font-size: 14px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; }
+  .history-platform { color: var(--accent); text-transform: capitalize; }
+  .history-remove-btn {
+    background: transparent; border: none; color: var(--text-muted); width: 32px; height: 32px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    flex-shrink: 0; transition: 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .history-remove-btn:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  }
+
+  .switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--bg-elevated); border: 1px solid var(--border); transition: 0.3s; border-radius: 26px;
+  }
+  .slider:before {
+    position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+    background-color: var(--text-muted); transition: 0.3s; border-radius: 50%;
+  }
+  input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+  input:checked + .slider:before { transform: translateX(22px); background-color: #000; }
+
+  #centerPreview {
+    width: 100%; max-width: min(90vw, 1100px); aspect-ratio: 16/9;
+    background: #000; border-radius: 14px; border: 1px solid var(--border);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; position: relative;
+    display: none; margin-bottom: 20px; transition: aspect-ratio 0.3s ease, max-height 0.3s ease;
+  }
+
+  #centerPreview.vertical-video {
+    aspect-ratio: 9/16; max-height: 65vh;
+  }
+
+  .center-thumb { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+  .center-play-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .center-play-overlay:hover { background: rgba(0,0,0,0.5); }
+    .center-play-overlay:hover .center-play-icon { transform: scale(1.1); }
+  }
+  .center-play-icon {
+    width: 56px; height: 56px; background: var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: #000;
+    transition: 0.2s; padding-left: 3px;
+  }
+
+  #centerPreview video { width: 100%; height: 100%; display: none; object-fit: contain; }
+
+  .player-controls {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: none; flex-direction: column; gap: 8px;
+    padding: 10px 16px 12px; z-index: 5;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, transparent 100%);
+  }
+  #centerPreview.video-active .player-controls { display: flex; }
+
+  .player-seek-row { display: flex; align-items: center; width: 100%; }
+  .player-seek {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 4px;
+    background: rgba(255,255,255,0.25); cursor: pointer; outline: none;
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat; background-size: 0% 100%;
+  }
+  .player-seek::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 13px; height: 13px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.5);
+    transition: transform 0.15s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .player-seek:hover::-webkit-slider-thumb { transform: scale(1.2); }
+  }
+  .player-seek::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer;
+  }
+
+  .player-bottom-row { display: flex; align-items: center; gap: 12px; }
+  .player-btn {
+    background: transparent; border: none; color: #fff; cursor: pointer; padding: 4px;
+    display: flex; align-items: center; justify-content: center; opacity: 0.9; transition: 0.15s;
+    flex-shrink: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .player-btn:hover { opacity: 1; color: var(--accent); }
+  }
+  .player-time { color: #e5e7eb; font-size: 12px; font-variant-numeric: tabular-nums; flex-shrink: 0; white-space: nowrap; }
+  .player-spacer { flex: 1; }
+  .player-volume-row { display: flex; align-items: center; gap: 6px; }
+  .player-volume {
+    -webkit-appearance: none; appearance: none; width: 70px; height: 3px; border-radius: 3px;
+    background: rgba(255,255,255,0.25); cursor: pointer; outline: none;
+    background-image: linear-gradient(#fff, #fff);
+    background-repeat: no-repeat; background-size: 100% 100%;
+  }
+  .player-volume::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border-radius: 50%;
+    background: #fff; cursor: pointer;
+  }
+  .player-volume::-moz-range-thumb {
+    width: 10px; height: 10px; border-radius: 50%; background: #fff; border: none; cursor: pointer;
+  }
+
+  #playlistContainer {
+    width: 100%; max-width: min(90vw, 1100px); background: var(--bg-surface); border-radius: var(--radius);
+    padding: 20px; border: 1px solid var(--border); display: none; margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+  }
+  #playlistContainer.visible { display: block; }
+  .playlist-header { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 13px; font-weight: 600; }
+  .playlist-items-wrap { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .playlist-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+    background: var(--bg-elevated); border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  .download-dock {
+    position: fixed; bottom: -200px; left: 50%; transform: translateX(-50%);
+    width: 92%; max-width: min(95vw, 1350px); height: 104px;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: 0 12px 45px rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+    z-index: 1000;
+  }
+  .download-dock.active { bottom: 24px; }
+
+  .dock-media { display: flex; align-items: center; gap: 16px; width: 34%; min-width: 0; }
+  .dock-thumb { width: 72px; height: 72px; border-radius: 12px; background: #000; object-fit: cover; flex-shrink: 0; }
+  .dock-info { display: flex; flex-direction: column; overflow: hidden; min-width: 0; flex: 1; }
+  .dock-title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dock-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+
+  #platformLabel { color: var(--accent); text-decoration: none; transition: 0.2s; cursor: pointer; }
+  @media (hover: hover) and (pointer: fine) {
+    #platformLabel:hover { color: #fff; text-decoration: underline; }
+  }
+
+  .dock-center { flex: 1; display: flex; justify-content: center; }
+  .res-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .chip {
+    padding: 7px 16px; background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .chip:hover { border-color: var(--accent); color: var(--text-main); }
+  }
+  .chip.selected { background: rgba(28, 181, 162, 0.15); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+  .dock-actions { display: flex; gap: 12px; width: 30%; justify-content: flex-end; }
+  .btn-action {
+    display: flex; align-items: center; gap: 6px; padding: 11px 22px;
+    border-radius: 20px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s;
+  }
+  .btn-audio { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
+  .btn-video { background: var(--accent); color: #000; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-audio:hover { background: var(--bg-elevated); border-color: var(--text-muted); }
+    .btn-video:hover { box-shadow: 0 0 15px rgba(28, 181, 162, 0.4); transform: translateY(-1px); }
+  }
+
+  /* --- BOTTOM AUDIO PLAYER BAR --- */
+  .audio-player-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 90px; background: var(--bg-elevated);
+    border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px max(0px, env(safe-area-inset-bottom)); z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  }
+  .audio-player-bar.active { transform: translateY(0); }
+  .audio-player-bar.minimized { transform: translateY(100%); }
+
+  /* Minimized Vinyl Widget in Corner */
+  .minimized-vinyl-dock {
+    position: fixed; bottom: 20px; right: 24px; background: var(--bg-surface);
+    border: 1px solid var(--border); padding: 8px; border-radius: 40px;
+    display: flex; align-items: center; gap: 6px; z-index: 1999; cursor: pointer;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.7); opacity: 0; pointer-events: none;
+    transform: translateY(20px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .minimized-vinyl-dock.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  @media (hover: hover) and (pointer: fine) {
+    .minimized-vinyl-dock:hover { border-color: var(--accent); background: var(--bg-elevated); }
+    .minimized-vinyl-dock:hover .min-cd-cover { animation-duration: 1.2s; }
+  }
+
+  .min-album-cover { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #000; flex-shrink: 0; }
+
+  .min-cd-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid #1a1a1a;
+    background: radial-gradient(circle, #222 30%, #000 70%);
+    box-shadow: 0 0 8px rgba(0,0,0,0.6);
+  }
+
+  .min-cd-cover {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    animation: spinCd 4s linear infinite;
+    animation-play-state: paused;
+    will-change: transform;
+  }
+  .minimized-vinyl-dock.playing .min-cd-cover { animation-play-state: running; }
+
+  .min-cd-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px; height: 10px;
+    background: var(--bg-base);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* Minimize Button inside the bar */
+  .player-minimize-btn {
+    position: absolute; top: 6px; right: 10px; background: transparent; border: none;
+    color: var(--text-muted); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; padding: 4px; border-radius: 6px; transition: 0.2s;
+    z-index: 10;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .player-minimize-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+  }
+
+  .player-left { display: flex; align-items: center; justify-content: flex-start; gap: 16px; flex: 1 1 320px; max-width: 420px; min-width: 200px; }
+  .player-art { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex-shrink: 0; }
+  .player-meta { display: flex; flex-direction: column; overflow: hidden; min-width: 0; flex: 1; }
+  .player-title { font-size: 14px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .player-artist { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
+
+  .player-center {
+    flex: 2 1 auto;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .player-controls-audio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+  }
+  .ctrl-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ctrl-btn:hover { color: var(--text-main); transform: scale(1.1); }
+  }
+
+  .ctrl-play {
+    width: 52px;
+    height: 52px;
+    background: var(--text-main);
+    color: var(--bg-base);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ctrl-play:hover { background: var(--accent); color: #000; transform: scale(1.05); }
+  }
+
+  .player-timeline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-container { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; position: relative; cursor: pointer; transition: height 0.2s ease, border-radius 0.2s ease; }
+  .progress-container:hover, .progress-container.dragging { height: 6px; border-radius: 3px; }
+  .progress-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--text-main); width: 0%; pointer-events: none; transition: background 0.2s; border-radius: inherit; }
+  .progress-container:hover .progress-bar, .progress-container.dragging .progress-bar { background: var(--accent); }
+  .progress-thumb {
+    position: absolute; top: 50%; right: 0; width: 13px; height: 13px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 6px rgba(0,0,0,0.5);
+    transform: translate(50%, -50%) scale(0); opacity: 0; pointer-events: none;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .progress-container:hover .progress-thumb, .progress-container.dragging .progress-thumb {
+    transform: translate(50%, -50%) scale(1); opacity: 1;
+  }
+
+  .player-right { display: flex; align-items: center; justify-content: flex-end; gap: 24px; flex: 1 1 280px; max-width: 380px; min-width: 200px; }
+  .dl-music-btn {
+    display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dl-music-btn:hover { background: var(--bg-surface); border-color: rgba(255,255,255,0.2); }
+  }
+  .vol-container { display: flex; align-items: center; gap: 10px; width: 150px; color: var(--text-muted); flex-shrink: 0; }
+  .vol-slider { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer; transition: height 0.2s ease, border-radius 0.2s ease; }
+  .vol-container:hover .vol-slider { height: 6px; border-radius: 3px; }
+  .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--text-main); box-shadow: 0 0 4px rgba(0,0,0,0.4); }
+
+  .status-toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: var(--bg-surface); border: 1px solid var(--accent); color: var(--text-main);
+    padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500;
+    opacity: 0; pointer-events: none; transition: 0.3s; z-index: 3000;
+  }
+  .status-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .status-toast.error { border-color: #ef4444; }
+
+  #fetchBtn { display: none; }
+
+  @media (max-width: 768px) {
+    body {
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .sidebar-backdrop { display: block; }
+
+    .sidebar {
+      position: absolute; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.8); width: 260px;
+      padding-top: max(24px, env(safe-area-inset-top)); z-index: 50;
+    }
+    body.sidebar-collapsed .sidebar { margin-left: -260px; }
+
+    .top-header { padding: max(16px, env(safe-area-inset-top)) 16px 16px 64px; }
+    body.sidebar-collapsed .top-header { padding-left: 64px; }
+
+    .qa-btn { width: 38px; height: 38px; }
+
+    .content-area, .settings-view, .history-view, .music-view { padding: 16px; padding-bottom: 250px; }
+
+    .download-dock {
+      width: 94%; height: auto; flex-direction: column; padding: 16px; gap: 14px; bottom: -320px;
+    }
+    .download-dock.active { bottom: max(16px, env(safe-area-inset-bottom)); }
+    body.audio-player-active .download-dock.active { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 210px); }
+
+    .dock-media { width: 100%; justify-content: flex-start; }
+    .dock-center, .dock-actions { width: 100%; justify-content: space-between; }
+    .dock-center { justify-content: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px 0; }
+    .dock-actions { display: flex; gap: 10px; }
+    .btn-action { flex: 1; justify-content: center; padding: 12px; }
+
+    /* STACKED MOBILE PLAYER BAR */
+    .audio-player-bar {
+      height: auto;
+      padding: 16px 20px calc(24px + env(safe-area-inset-bottom)) 20px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      bottom: -300px;
+      border-radius: 20px 20px 0 0;
+    }
+    .audio-player-bar.active { bottom: 0; }
+
+    .player-minimize-btn { top: 12px; right: 16px; padding: 8px; }
+
+    .player-left { flex: 1 1 auto; max-width: 100%; padding-right: 32px; gap: 12px; }
+    .player-art { width: 56px; height: 56px; }
+    .player-title { font-size: 15px; }
+    .player-artist { font-size: 13px; margin-top: 2px; }
+
+    .player-center { flex: 1 1 auto; max-width: 100%; flex-direction: column; gap: 12px; }
+    .player-timeline { display: flex; width: 100%; }
+    .player-controls-audio button:not(.ctrl-play) { display: flex; }
+    .ctrl-play { width: 44px; height: 44px; }
+
+    .player-right { flex: 1 1 auto; width: 100%; max-width: 100%; justify-content: space-between; gap: 12px; flex-direction: row; align-items: center; }
+    .dl-music-btn { margin-right: auto; padding: 8px 16px; font-size: 12px; }
+    .vol-container { display: flex; width: auto; flex: 1; justify-content: flex-end; }
+    .vol-slider { width: 100px; }
+
+    .music-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+
+    .minimized-vinyl-dock { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
+    .minimized-vinyl-dock.dock-clash { bottom: calc(max(90px, env(safe-area-inset-bottom)) + 20px); }
+  }
+
+/* ===================== Overrides ===================== */
+/* =========================================================
+ Welcome for style downloaderhub
+   Single stylesheet: base styles first, then the overrides further down.
+   Part 1: Music tab + player.  Part 2 (bottom): sidebar, top bar, tabs, settings.
+
+   - Layout / motion patterns follow(card grid, hover lift,
+     floating blurred player bar, 6px seek bar).
+   - ALL colors come from the Settings theme + accent
+     (--bg-base, --bg-surface, --bg-elevated, --text-main, --text-muted,
+      --border, --accent), so it follows whatever theme/accent is picked.
+   - No font rules on purpose, so the app font stays consistent.
+   ========================================================= */
+
+:root {
+  --mc-radius: 8px;
+  --mc-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.15), 0 2px 4px -2px rgb(0 0 0 / 0.15);
+  --mc-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+  --mc-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.25), 0 8px 10px -6px rgb(0 0 0 / 0.25);
+  --mc-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+  --mc-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------------------------------------------------------
+   Music page
+   --------------------------------------------------------- */
+.music-view {
+  /* soft accent glow at the top of the page */
+  background:
+    radial-gradient(ellipse 70% 320px at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--bg-base);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-main) 25%, transparent) transparent;
+}
+.music-view::-webkit-scrollbar { width: 8px; }
+.music-view::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-main) 22%, transparent);
+  border-radius: 8px;
+}
+.music-view::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--text-main) 38%, transparent); }
+
+/* small accent bar under the page title (no font changes) */
+.music-header h1::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+/* ---------------------------------------------------------
+   Search
+   --------------------------------------------------------- */
+.music-view .search-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--mc-radius);
+  box-shadow: none;
+  padding-left: 14px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.music-view .search-box:focus-within {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ---------------------------------------------------------
+   Card grid
+   --------------------------------------------------------- */
+@media (min-width: 769px) {
+  .music-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
+}
+
+@keyframes mcCardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.track-card {
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  border-radius: var(--mc-radius);
+  padding: 16px;
+  gap: 14px;
+  box-shadow: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  animation: mcCardIn 0.45s ease backwards;
+}
+/* staggered entrance */
+.track-card:nth-child(1)  { animation-delay: 0.00s; }
+.track-card:nth-child(2)  { animation-delay: 0.04s; }
+.track-card:nth-child(3)  { animation-delay: 0.08s; }
+.track-card:nth-child(4)  { animation-delay: 0.12s; }
+.track-card:nth-child(5)  { animation-delay: 0.16s; }
+.track-card:nth-child(6)  { animation-delay: 0.20s; }
+.track-card:nth-child(7)  { animation-delay: 0.24s; }
+.track-card:nth-child(8)  { animation-delay: 0.28s; }
+.track-card:nth-child(9)  { animation-delay: 0.32s; }
+.track-card:nth-child(10) { animation-delay: 0.36s; }
+.track-card:nth-child(n+11) { animation-delay: 0.40s; }
+
+@media (hover: hover) and (pointer: fine) {
+  .track-card:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border);
+    transform: translateY(-6px);
+    box-shadow: var(--mc-shadow-lg);
+  }
+  .track-card:hover .track-art-wrapper { box-shadow: var(--mc-shadow-xl); }
+  .track-card:hover .track-art { transform: scale(1.05); }
+  .track-card:hover .track-play-btn { transform: scale(1); }
+}
+
+.track-art-wrapper {
+  border-radius: var(--mc-radius);
+  background: var(--bg-elevated);
+  box-shadow: var(--mc-shadow-md);
+  transition: box-shadow 0.25s ease;
+}
+.track-art { transition: transform 0.4s ease; }
+/* Optional: uncomment for fully grayscale artwork */
+/* .track-art { filter: grayscale(1) contrast(1.05); } */
+
+.track-overlay {
+  border-radius: var(--mc-radius);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.1));
+}
+.track-play-btn {
+  box-shadow: var(--mc-shadow-lg);
+  transform: scale(0.8);
+  transition: transform 0.3s var(--mc-ease-back);
+}
+.track-info { gap: 2px; }
+
+/* ---------------------------------------------------------
+   Now playing: spinning CD (kept!) with accent glow + vinyl grooves
+   --------------------------------------------------------- */
+.track-card.playing {
+  background: var(--bg-elevated);
+  border-color: var(--border);
+}
+.track-card.playing .track-art-wrapper {
+  border-radius: 50% !important;
+  animation: spinCd 4s linear infinite;
+  border: 4px solid #141414;
+  background: radial-gradient(circle, #222 30%, #000 70%);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 0 28px color-mix(in srgb, var(--accent) 45%, transparent),
+    var(--mc-shadow-lg);
+}
+/* fine vinyl grooves over the cover */
+.track-card.playing .track-art-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle at center, transparent 0 3px, rgb(0 0 0 / 0.13) 3px 4px);
+  z-index: 2;
+  pointer-events: none;
+}
+/* center hub keeps the accent ring from the base styles */
+.track-card.playing .track-art-wrapper::after {
+  box-shadow: inset 0 0 4px rgb(0 0 0 / 0.9), 0 0 10px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.track-card.playing .track-overlay { border-radius: 50%; }
+.track-card.playing .track-title { color: var(--accent); }
+@media (hover: hover) and (pointer: fine) {
+  .track-card.playing:hover .track-art { transform: none; }
+}
+
+/* ---------------------------------------------------------
+   Player bar
+   --------------------------------------------------------- */
+.audio-player-bar {
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: var(--mc-shadow-2xl);
+}
+.player-art { border-radius: var(--mc-radius); box-shadow: var(--mc-shadow-md); }
+
+/* Floating, rounded bar on desktop (mobile keeps its stacked bottom sheet) */
+@media (min-width: 769px) {
+  .audio-player-bar {
+    left: calc(250px + 16px);
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    border-radius: 12px;
+    padding: 0 24px;
+    transform: translateY(calc(100% + 48px));
+    transition:
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 0.3s;
+  }
+  body.sidebar-collapsed .audio-player-bar { left: 16px; }
+  .audio-player-bar.active { transform: translateY(0); }
+  .audio-player-bar.minimized { transform: translateY(calc(100% + 48px)); }
+}
+
+/* Seek + volume bars: 6px, small radius, muted fill -> accent on hover */
+.progress-container {
+  height: 6px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--text-main) 12%, transparent);
+}
+.progress-container:hover,
+.progress-container.dragging { height: 8px; border-radius: 2px; }
+.progress-bar { background: var(--text-muted); border-radius: 2px; }
+.progress-container:hover .progress-bar,
+.progress-container.dragging .progress-bar { background: var(--accent); }
+.progress-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+}
+.vol-slider { border-radius: 2px; background: color-mix(in srgb, var(--text-main) 12%, transparent); }
+
+.dl-music-btn { border-radius: var(--mc-radius); border: 1px solid var(--border); background: transparent; }
+.dl-music-btn:hover { background: var(--bg-surface); border-color: var(--accent); color: var(--accent); }
+
+/* ---------------------------------------------------------
+   Minimized dock
+   --------------------------------------------------------- */
+.minimized-vinyl-dock {
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: var(--mc-shadow-xl);
+}
+.min-cd-wrapper { border-color: var(--bg-elevated); }
+
+/* ---------------------------------------------------------
+   Accessibility: respect reduced-motion settings
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .track-card { animation: none; }
+  .track-card.playing .track-art-wrapper { animation: none; }
+  .track-card, .track-art, .track-play-btn { transition: none; }
+}
+
+
+/* =========================================================
+   PART 2 — App shell (sidebar, top bar, tabs, settings, dock)
+   ========================================================= */
+
+:root {
+  /* Active sidebar pill. For the white pill from Monochrome's screenshot use:
+     --mc-pill-bg: var(--text-main);  --mc-pill-fg: var(--bg-base);          */
+  --mc-pill-bg: var(--accent);
+  --mc-pill-fg: #000;
+}
+
+/* ---------- Sidebar ---------- */
+.brand-logo-box { width: 32px; height: 32px; border-radius: var(--mc-radius); }
+.nav-group { gap: 4px; }
+.nav-item { border-radius: var(--mc-radius); padding: 10px 14px; gap: 14px; }
+@media (hover: hover) and (pointer: fine) {
+  .nav-item:hover:not(.active) {
+    color: var(--text-main);
+    background: color-mix(in srgb, var(--text-main) 7%, transparent);
+  }
+  .collapse-btn:hover,
+  .show-sidebar-btn:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+}
+/* active item = solid pill, like Monochrome */
+.nav-item.active { background: var(--mc-pill-bg); color: var(--mc-pill-fg); }
+.nav-item.active::before { display: none; }
+.nav-item.active svg { color: inherit; }
+
+/* ---------- Top bar + search ---------- */
+.top-header { padding-bottom: 0; background: var(--bg-base); }
+.search-box {
+  border-radius: var(--mc-radius);
+  padding: 10px 16px;
+}
+.search-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* ---------- Platform filters -> underline tabs ---------- */
+.platform-filters { gap: 4px; padding-bottom: 0; margin-bottom: -1px; }
+.filter-chip {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 10px 12px 12px;
+  color: var(--text-muted);
+}
+@media (hover: hover) and (pointer: fine) {
+  .filter-chip:hover { color: var(--text-main); border-bottom-color: color-mix(in srgb, var(--text-main) 25%, transparent); }
+}
+.filter-chip.active {
+  background: transparent;
+  color: var(--text-main);
+  border-color: transparent;
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- Home empty state: plain, no heavy card ---------- */
+.empty-hero-card { background: transparent; border: none; box-shadow: none; }
+
+/* ---------- Download dock: same floating glass as the player ---------- */
+.download-dock {
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: var(--mc-shadow-2xl);
+}
+
+/* ---------- Settings: underline tabs + accent-aware pills ---------- */
+.settings-tabs { gap: 4px; padding-bottom: 0; }
+.settings-tab {
+  border-radius: 0;
+  padding: 10px 14px 12px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.settings-tab.active {
+  background: transparent;
+  color: var(--text-main);
+  border-bottom-color: var(--accent);
+}
+.theme-pill { border-radius: var(--mc-radius); }
+.theme-pill.active {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.chip { border-radius: var(--mc-radius); }
+.chip.selected {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-video:hover { box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 40%, transparent); }
+}
+
+/* ---------- Player bar layout: timeline on top, controls below ---------- */
+.player-center { gap: 6px; }
+.player-timeline { order: -1; }
+.player-art { width: 56px; height: 56px; border-radius: 6px; }
+.ctrl-btn { border-radius: 50%; }
+@media (hover: hover) and (pointer: fine) {
+  .ctrl-btn:hover:not(.ctrl-play) {
+    background: color-mix(in srgb, var(--text-main) 8%, transparent);
+  }
+}
+.ctrl-play { width: 40px; height: 40px; }
+.ctrl-play svg { width: 20px; height: 20px; }
+
+/* Download button -> ghost icon button (text hidden) */
+.dl-music-btn {
+  font-size: 0;
+  gap: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+.dl-music-btn:hover {
+  background: color-mix(in srgb, var(--text-main) 8%, transparent);
+  color: var(--text-main);
+  border: none;
+}
+.dl-music-btn svg { width: 18px; height: 18px; }
+
+
+/* =========================================================
+   PART 3 — Music sub-menu, card actions, playlists
+   ========================================================= */
+
+/* ---------- Sub-menu under "Music" in the sidebar ---------- */
+.nav-sub {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: -4px;
+  transition: grid-template-rows 0.3s ease, opacity 0.25s ease;
+}
+.nav-sub.open { grid-template-rows: 1fr; opacity: 1; margin-top: 0; }
+.nav-sub-inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 22px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+.nav-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+.nav-sub-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .nav-sub-item:hover:not(.active) {
+    color: var(--text-main);
+    background: color-mix(in srgb, var(--text-main) 7%, transparent);
+  }
+}
+.nav-sub-item.active {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* ---------- Like / add buttons on cards ---------- */
+.track-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 20;
+}
+.track-action {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgb(0 0 0 / 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.2s ease, transform 0.2s var(--mc-ease-back), background-color 0.2s ease, color 0.2s ease;
+}
+.track-action:hover { background: rgb(0 0 0 / 0.8); transform: scale(1.08); }
+@media (hover: hover) and (pointer: fine) {
+  .track-card:hover .track-action { opacity: 1; transform: scale(1); }
+  .track-card:hover .track-action:hover { transform: scale(1.08); }
+}
+@media (hover: none) {
+  .track-action { opacity: 1; transform: scale(1); }
+}
+.track-action.liked { opacity: 1; transform: scale(1); color: #ef4444; }
+.track-action.liked svg { fill: currentColor; }
+
+/* ---------- "Add to playlist" popover ---------- */
+.mc-popover {
+  position: fixed;
+  z-index: 3000;
+  min-width: 210px;
+  max-width: 260px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--mc-radius);
+  box-shadow: var(--mc-shadow-2xl);
+  animation: mcCardIn 0.18s ease;
+}
+.mc-pop-title {
+  padding: 8px 10px 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.mc-pop-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.mc-pop-item:hover { background: color-mix(in srgb, var(--text-main) 8%, transparent); }
+.mc-pop-item.on .mc-pop-check { color: var(--accent); }
+.mc-pop-new { color: var(--accent); border-top: 1px solid var(--border); border-radius: 0 0 6px 6px; margin-top: 4px; }
+
+/* ---------- Playlists screens ---------- */
+.mc-toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.mc-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--mc-radius);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.mc-btn:hover { background: var(--bg-surface); border-color: var(--accent); }
+.mc-btn-danger { margin-left: auto; }
+.mc-btn-danger:hover { border-color: #ef4444; color: #ef4444; }
+
+.pl-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+}
+.pl-create .pl-art { border: 1px dashed color-mix(in srgb, var(--text-main) 30%, transparent); box-shadow: none; }
+@media (hover: hover) and (pointer: fine) {
+  .pl-create:hover .pl-art { color: var(--accent); border-color: var(--accent); }
+}
+
+
+/* Mobile: reserve a clear top-left lane for the floating sidebar toggle
+   on every view, including Music and Settings. */
+@media (max-width: 768px) {
+  .content-area,
+  .settings-view,
+  .history-view,
+  .music-view {
+    padding-top: 72px !important;
+  }
+
+  .minimized-vinyl-dock {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+  }
+  .minimized-vinyl-dock:active { cursor: grabbing; }
+}
+
+
+/* =========================================================
+   PART 4 — v3.0: Collections, welcome screen, dialogs,
+   new settings (corner style, card size, reduce motion)
+   ========================================================= */
+
+/* ---------- Card size (Settings > Card Size) + Corner style ---------- */
+:root { --mc-card-base: 200px; --mc-density: 1; }
+@media (max-width: 768px) {
+  :root { --mc-card-base: 140px; }
+  .music-grid { gap: 14px; }
+}
+.music-grid {
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--mc-card-base) * var(--mc-density)), 1fr));
+}
+
+/* ---------- Reduce motion (Settings > Reduce Motion) ---------- */
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ---------- Card action buttons: stacked, so 3 fit on small cards ---------- */
+.track-actions { flex-direction: column; }
+.track-action svg { width: 15px; height: 15px; }
+
+/* ---------- Settings layout ---------- */
+.setting-block { margin-bottom: 28px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.setting-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.setting-buttons .btn-action { border-radius: var(--mc-radius); padding: 10px 20px; }
+.accent-custom-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 14px; max-width: 340px; color: var(--text-muted); font-size: 13px;
+}
+.accent-custom-row input[type="color"] {
+  width: 44px; height: 32px; padding: 2px; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 8px; background: transparent;
+}
+
+/* ---------- Dock: Save button ---------- */
+.btn-save svg { flex-shrink: 0; }
+
+/* ---------- Collections ---------- */
+.collections-view {
+  display: none; flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 180px;
+  animation: fadeIn 0.3s ease;
+}
+.collections-header,
+.collections-toolbar,
+.collections-list { max-width: 1100px; width: 100%; margin-left: auto; margin-right: auto; }
+.collections-header { margin-bottom: 24px; }
+.collections-sub { margin: 8px 0 0; color: var(--text-muted); font-size: 14px; }
+.collections-toolbar { flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 20px; }
+.collections-list { flex-direction: column; gap: 10px; }
+.collection-note { color: #ef4444; font-size: 12px; font-weight: 600; }
+.collection-item.dead .history-thumb { filter: grayscale(1); opacity: 0.45; }
+.collection-item.dead .history-title { color: var(--text-muted); }
+.history-remove-btn.history-save-btn:hover,
+.history-remove-btn.item-dl-btn:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+@media (max-width: 768px) {
+  .collections-view { padding: 20px 16px; padding-bottom: 180px; }
+}
+
+/* ---------- In-app dialog ---------- */
+.app-dialog-backdrop {
+  position: fixed; inset: 0; z-index: 6000; align-items: center; justify-content: center;
+  padding: 16px; background: rgb(0 0 0 / 0.55);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.app-dialog {
+  width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; padding: 22px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: calc(var(--mc-radius) * 1.5); box-shadow: var(--mc-shadow-2xl);
+  animation: mcCardIn 0.2s ease;
+}
+.app-dialog h3 { margin: 0; font-size: 17px; color: var(--text-main); }
+.app-dialog p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+.app-dialog input {
+  padding: 11px 14px; font-size: 15px; color: var(--text-main); outline: none;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--mc-radius);
+}
+.app-dialog input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.app-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.app-dialog-btn {
+  padding: 9px 16px; font-weight: 600; cursor: pointer; color: var(--text-main);
+  background: transparent; border: 1px solid var(--border); border-radius: var(--mc-radius);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.app-dialog-btn:hover { background: var(--bg-surface); border-color: var(--accent); }
+.app-dialog-btn.primary { background: var(--accent); border-color: var(--accent); color: #000; }
+.app-dialog-btn.primary:hover { filter: brightness(1.08); }
+.app-dialog-btn.primary.danger { background: #ef4444; border-color: #ef4444; color: #fff; }
+
+/* ---------- Welcome screen ---------- */
+@keyframes welcomeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.welcome-overlay {
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 5000; align-items: center; justify-content: center;
+  padding: 16px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: rgba(12, 14, 18, 0.88);
+  background: color-mix(in srgb, var(--bg-base) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  animation: fadeIn 0.3s ease;
+}
+.welcome-card {
+  position: relative; width: 100%; max-width: 460px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); max-height: 100%;
+  display: flex; flex-direction: column; padding: 30px 24px 20px; overflow: hidden;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: calc(var(--mc-radius) * 2); box-shadow: var(--mc-shadow-2xl);
+}
+.welcome-skip {
+  position: absolute; top: 14px; right: 16px; padding: 6px 10px; cursor: pointer;
+  background: transparent; border: none; border-radius: 6px; color: var(--text-muted); font-size: 13px;
+}
+.welcome-skip:hover { color: var(--text-main); background: color-mix(in srgb, var(--text-main) 8%, transparent); }
+.welcome-steps { flex: 1; min-height: 0; overflow-y: auto; }
+.welcome-step { display: none; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.welcome-step.active { display: flex; animation: welcomeIn 0.35s ease; }
+.welcome-icon {
+  width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;
+  border-radius: 18px; color: var(--accent);
+  background: rgba(28, 181, 162, 0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.welcome-icon svg { width: 30px; height: 30px; }
+.welcome-step h2 { margin: 6px 0 0; font-size: 22px; color: var(--text-main); }
+.welcome-step p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text-muted); }
+.welcome-step p strong { color: var(--text-main); }
+.welcome-points {
+  list-style: none; margin: 4px 0 0; padding: 0; width: 100%;
+  display: flex; flex-direction: column; gap: 10px; text-align: left;
+}
+.welcome-points li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-main); }
+.welcome-points svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; color: var(--accent); }
+.welcome-note { font-size: 12px !important; margin-top: 4px !important; }
+.welcome-action {
+  margin-top: 6px; padding: 10px 18px; font-weight: 600; cursor: pointer; color: var(--accent);
+  background: transparent; border: 1px solid var(--accent); border-radius: var(--mc-radius);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.welcome-action:hover { background: var(--accent); color: #000; }
+.welcome-group-label { align-self: flex-start; margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+.welcome-step .theme-pills { justify-content: flex-start; width: 100%; }
+.welcome-swatches { display: flex; gap: 14px; align-self: flex-start; padding: 4px 4px 6px; }
+.welcome-swatch {
+  width: 34px; height: 34px; padding: 0; cursor: pointer; border: none; border-radius: 50%;
+  transition: transform 0.2s var(--mc-ease-back);
+}
+.welcome-swatch:hover { transform: scale(1.1); }
+.welcome-swatch.active { outline: 2px solid var(--text-main); outline-offset: 3px; }
+.welcome-footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-top: 18px; }
+.welcome-footer .welcome-back { justify-self: start; }
+.welcome-footer .welcome-next { justify-self: end; }
+.welcome-dots { display: flex; gap: 6px; }
+.welcome-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(148, 163, 184, 0.35);
+  background: color-mix(in srgb, var(--text-main) 22%, transparent);
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+.welcome-dot.active { width: 20px; border-radius: 4px; background: var(--accent); }
+.welcome-back {
+  padding: 10px 12px; cursor: pointer; background: transparent; border: none;
+  border-radius: var(--mc-radius); color: var(--text-muted);
+}
+.welcome-back:hover { color: var(--text-main); }
+.welcome-next {
+  padding: 11px 22px; font-weight: 700; cursor: pointer; color: #000;
+  background: var(--accent); border: none; border-radius: var(--mc-radius);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+.welcome-next:hover { filter: brightness(1.08); }
+.welcome-next:active { transform: scale(0.97); }
+
+
+/* Mobile: keep page titles clear of the floating "show sidebar" button */
+@media (max-width: 768px) {
+  .settings-title { padding-left: 52px; }
+}
+
+/* Welcome screen on small phones: smaller type and spacing so the Next button never gets pushed off screen */
+@media (max-width: 480px), (max-height: 680px) {
+  .welcome-overlay { padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+  .welcome-card { padding: 26px 16px 14px; border-radius: 18px; }
+  .welcome-icon { width: 52px; height: 52px; border-radius: 15px; }
+  .welcome-icon svg { width: 26px; height: 26px; }
+  .welcome-step { gap: 10px; }
+  .welcome-step h2 { font-size: 19px; }
+  .welcome-step p, .welcome-points li { font-size: 13px; }
+  .welcome-footer { margin-top: 12px; }
+  .welcome-next { padding: 10px 18px; }
+  .welcome-swatch { width: 30px; height: 30px; }
+}
+
+/* Share on Local Network (Settings > System) */
+#shareLinks { margin-top: 14px; }
+.share-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.share-url {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px;
+  padding: 8px 12px; border-radius: var(--mc-radius, 12px);
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  user-select: all; word-break: break-all;
+}
+.share-copy { padding: 8px 14px; }
+.share-tip { margin-top: 10px; margin-bottom: 0; }
+
+/* ---------- Download complete popup ---------- */
+.done-dialog { align-items: center; text-align: center; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; }
+.done-icon {
+  width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: var(--accent);
+  background: rgba(28, 181, 162, 0.16);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.done-files { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.done-files li {
+  font-size: 13px; color: var(--text-main); padding: 8px 12px; text-align: left;
+  border-radius: var(--mc-radius); background: var(--bg-surface); border: 1px solid var(--border);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.done-files li.more { color: var(--text-muted); background: transparent; border-style: dashed; text-align: center; }
+.done-note { font-size: 13px; color: #ef4444; margin: 0; }
+.done-where {
+  width: 100%; text-align: left; padding: 12px 14px;
+  border-radius: var(--mc-radius); background: var(--bg-surface); border: 1px solid var(--border);
+}
+.done-where-title { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.done-path { font-size: 14px; color: var(--text-main); }
+.done-path b { color: var(--accent); }
+.done-hint { margin-top: 6px; font-size: 12.5px; line-height: 1.45; color: var(--text-muted); }
+.done-dialog .app-dialog-actions { width: 100%; }
+.done-dialog .app-dialog-btn { flex: 1; }
+
+
+/* =========================================================
+   PART 5 - Home screen: roomier link box on phones
+   ========================================================= */
+.top-header .search-box { min-height: 50px; }
+
+@media (max-width: 768px) {
+  .top-header { gap: 10px; padding: max(16px, env(safe-area-inset-top)) 14px 0 64px; }
+  body.sidebar-collapsed .top-header { padding-left: 64px; }
+
+  /* the magnifier icon only steals space; the buttons on the right need it more */
+  .top-header .search-box { min-height: 52px; padding: 4px 4px 4px 16px; max-width: none; }
+  .top-header .search-box > svg { display: none; }
+  .top-header .search-box input { font-size: 16px; padding: 10px 0; }
+  .top-header .quick-actions { gap: 2px; }
+  .top-header .qa-btn { width: 42px; height: 42px; }
+
+  /* one scrollable row instead of wrapping into two lines */
+  .platform-filters {
+    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    margin-left: -4px; margin-right: -14px; padding-right: 14px; scrollbar-width: none;
+  }
+  .filter-chip { padding: 10px 14px 12px; font-size: 13px; }
+}
+
+@media (max-width: 380px) {
+  .filter-chip { padding: 10px 11px 12px; font-size: 12.5px; }
+}
+
+
+/* =========================================================
+   PART 6 - Phone fixes: link box overflow, compact download dock,
+   preview that fits above the dock, readable popups
+   ========================================================= */
+
+/* The link box grew wider than the screen once a link was typed (the clear button appeared
+   and the input's built-in width pushed the row out). Let it shrink instead. */
+.top-header { min-width: 0; }
+.top-header .search-wrapper { min-width: 0; }
+.top-header .search-box { min-width: 0; }
+.top-header .search-box input { width: 0; min-width: 0; flex: 1 1 0; }
+
+/* Popups: they used to squeeze into a narrow column on phones */
+.status-toast {
+  width: max-content; max-width: min(92vw, 440px);
+  text-align: center; line-height: 1.4; padding: 12px 18px; border-radius: 16px;
+  top: max(16px, env(safe-area-inset-top)); overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  /* compact download dock: small thumbnail, quality chips in ONE row, snug buttons */
+  .download-dock { padding: 12px; gap: 10px; bottom: -280px; }
+  .dock-media { gap: 12px; }
+  .dock-thumb { width: 52px; height: 52px; border-radius: 10px; }
+  .dock-title { font-size: 14px; }
+  .dock-meta { margin-top: 2px; }
+  .dock-center { padding: 8px 0; min-width: 0; overflow: hidden; }
+  .res-chips {
+    flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; width: 100%; gap: 6px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .res-chips::-webkit-scrollbar { display: none; }
+  .chip { flex: 1 0 auto; text-align: center; padding: 8px 12px; font-size: 12.5px; }
+  .dock-actions { gap: 8px; }
+  .btn-action { padding: 10px 6px; font-size: 13px; gap: 5px; }
+  .content-area, .settings-view, .history-view, .music-view { padding-bottom: 210px; }
+
+  /* the preview keeps its real shape and stays above the dock */
+  #centerPreview { margin-bottom: 12px; }
+  #centerPreview.vertical-video {
+    --pv-h: clamp(220px, calc(100vh - 430px), 560px);
+    height: var(--pv-h); width: calc(var(--pv-h) * 9 / 16);
+    max-height: none; aspect-ratio: auto; margin-left: auto; margin-right: auto;
+  }
+}
+
+
+/* =========================================================
+   PART 7 - native-feel baseline (mobile-native checklist)
+   ========================================================= */
+
+/* no grey flash on tap (every tappable thing below gets its own press feedback), no pull-to-refresh/rubber-band */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+/* controls respond at once (no double-tap-zoom wait) and their labels are not selectable;
+   body text stays selectable on purpose */
+button, a, [role="button"], .chip, .filter-chip, .theme-pill, .qa-btn {
+  touch-action: manipulation;
+}
+button, [role="button"], .chip, .filter-chip, .theme-pill, .qa-btn {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+
+/* press feedback on touch-down. `scale` is separate from `transform`, so it cannot break
+   elements that are positioned with transform */
+button:active:not(:disabled), .chip:active, .filter-chip:active, .theme-pill:active, .qa-btn:active {
+  scale: 0.97;
+}
+
+
+/* =========================================================
+   PART 8 - Phone app layout: bottom navigation bar
+   (Settings > Appearance > Mobile Navigation can bring the sidebar back)
+   ========================================================= */
+
+:root { --nav-h: 60px; --nav-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); }
+
+.bottom-nav { display: none; }
+.music-tabs { display: none; }
+@media (min-width: 769px) { #mobileNavBlock { display: none; } }
+
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 768px) {
+  body.nav-bottom .bottom-nav {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 2100;
+    height: var(--nav-bottom); padding: 6px 6px env(safe-area-inset-bottom, 0px);
+    background: color-mix(in srgb, var(--bg-surface) 90%, transparent);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+  }
+  .bn-item {
+    flex: 1; min-width: 0; position: relative; border: 0; background: transparent; color: var(--text-muted);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1px; border-radius: 14px;
+  }
+  .bn-item svg { width: 24px; height: 24px; transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1); }
+  .bn-item.active { color: var(--accent); }
+  .bn-item.active svg { transform: translateY(-1px) scale(1.08); }
+  .bn-item.active::before {
+    content: ''; position: absolute; top: -6px; left: 50%; width: 26px; height: 3px; margin-left: -13px;
+    border-radius: 0 0 3px 3px; background: var(--accent);
+  }
+
+  /* the sidebar and its floating button are not needed while the bottom bar is on */
+  body.nav-bottom .sidebar,
+  body.nav-bottom .show-sidebar-btn,
+  body.nav-bottom .sidebar-backdrop { display: none !important; }
+
+  /* content: no lane for the old toggle button, room for the bar at the bottom */
+  body.nav-bottom .top-header,
+  body.nav-bottom.sidebar-collapsed .top-header { padding-left: 16px; }
+  body.nav-bottom .content-area,
+  body.nav-bottom .settings-view,
+  body.nav-bottom .history-view,
+  body.nav-bottom .collections-view,
+  body.nav-bottom .music-view {
+    padding-top: 16px !important;
+    padding-bottom: calc(var(--nav-bottom) + 24px) !important;
+  }
+
+  /* everything that floats at the bottom now sits above the bar */
+  body.nav-bottom .download-dock.active { bottom: calc(var(--nav-bottom) + 8px); }
+  body.nav-bottom.audio-player-active .download-dock.active { bottom: calc(var(--nav-bottom) + 210px); }
+  body.nav-bottom .audio-player-bar.active { bottom: var(--nav-bottom); border-radius: 20px 20px 0 0; }
+  body.nav-bottom .minimized-vinyl-dock { bottom: calc(var(--nav-bottom) + 12px); }
+  body.nav-bottom .minimized-vinyl-dock.dock-clash { bottom: calc(var(--nav-bottom) + 212px); }
+
+  /* Music: Discover / Favorites / Recent as a segmented control (the sidebar sub-menu is hidden) */
+  body.nav-bottom .music-tabs {
+    display: flex; gap: 4px; margin-top: 14px; padding: 4px;
+    background: var(--bg-surface); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .music-tab {
+    flex: 1; padding: 9px 6px; border: 0; border-radius: 10px; background: transparent;
+    color: var(--text-muted); font-size: 13px; font-weight: 600;
+  }
+  .music-tab.active { background: var(--accent); color: #000; }
+}
+
+
+/* =========================================================
+   PART 9 - smoother phone UI, sliding tab indicator,
+   directional screen transitions, no page titles (Modern layout)
+   ========================================================= */
+
+/* Settings: the toggle was squashed by long descriptions; keep it a real 48px and let the text wrap */
+.switch { flex-shrink: 0; }
+.setting-row > div:first-child { min-width: 0; flex: 1; }
+
+/* the real setting is only meaningful on phones/tablets */
+@media (min-width: 1025px) { #mobileNavBlock { display: none; } }
+
+/* screens slide in from the side you are moving towards (--vx is set by the page) */
+@keyframes view-in {
+  from { opacity: 0; transform: translateX(var(--vx, 0px)); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 768px) {
+  /* Blur and big shadows are expensive on phones: solid colours scroll and animate more smoothly */
+  .bottom-nav, .audio-player-bar, .download-dock, .minimized-vinyl-dock {
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  body.nav-bottom .bottom-nav { background: var(--bg-surface); contain: layout style; }
+  .audio-player-bar { background: var(--bg-elevated); box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35); }
+  .download-dock { background: var(--bg-elevated); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45); }
+  .minimized-vinyl-dock { background: var(--bg-elevated); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5); }
+  .track-card { animation: none; }
+
+
+  /* the glowing marker on top of the bar slides to the active tab instead of jumping */
+  body.nav-bottom .bn-item.active::before { display: none; }
+  .bn-indicator {
+    position: absolute; top: 0; left: 6px; width: calc((100% - 12px) / 5); height: 3px; pointer-events: none;
+    transform: translateX(calc(var(--i, 0) * 100%));
+    transition: transform 0.32s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
+  }
+  .bn-indicator::after {
+    content: ''; position: absolute; left: 50%; width: 26px; height: 3px; margin-left: -13px;
+    border-radius: 0 0 3px 3px; background: var(--accent);
+  }
+  .bn-item { transition: color 0.2s ease; }
+
+  /* the bar already says where you are, so the big page titles go (Modern layout only) */
+  body.nav-bottom .settings-view > .settings-title,
+  body.nav-bottom #musicTitle,
+  body.nav-bottom #collectionsTitle,
+  body.nav-bottom .history-header .settings-title { display: none; }
+  body.nav-bottom .history-header { justify-content: flex-end; }
+}
+@media (min-width: 769px) { .bn-indicator { display: none; } }
+
+
+/* =========================================================
+   PART 10 - Music tabs: the glowing pill slides between sections
+   ========================================================= */
+@media (max-width: 768px) {
+  body.nav-bottom .music-tabs { position: relative; }
+  .music-tab { position: relative; z-index: 1; transition: color 0.25s ease; }
+  body.nav-bottom .music-tab.active { background: transparent; color: #000; }
+  .music-tab-pill {
+    position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 16px) / 3);
+    border-radius: 10px; background: var(--accent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+    transform: translateX(calc(var(--ti, 0) * (100% + 4px)));
+    transition: transform 0.32s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
+  }
+}
+@media (min-width: 769px) { .music-tab-pill { display: none; } }
+
+
+/* =========================================================
+   PART 11 - Swipe pager, swipe-to-delete, panel drag handle,
+   undo message, download cards, grouped settings rows
+   ========================================================= */
+
+/* ---------- swipe a list row left to delete ---------- */
+.swipe-wrap { position: relative; overflow: hidden; border-radius: var(--mc-radius, 12px); }
+.swipe-wrap > .history-item { position: relative; touch-action: pan-y; will-change: transform; }
+.swipe-bg {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 22px; background: #ef4444; color: #fff;
+}
+.swipe-bg svg { transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+.swipe-wrap.armed .swipe-bg svg { transform: scale(1.25); }
+
+/* ---------- "Removed ... Undo" ---------- */
+.undo-snack {
+  position: fixed; left: 12px; right: 12px; bottom: 16px; z-index: 2600;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; border-radius: 14px; background: var(--bg-elevated); border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); font-size: 14px;
+  transform: translate3d(0, 24px, 0); opacity: 0; pointer-events: none;
+  transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
+}
+.undo-snack.show { transform: none; opacity: 1; pointer-events: auto; }
+.undo-snack button { border: 0; background: transparent; color: var(--accent); font-weight: 700; font-size: 14px; padding: 6px 10px; }
+@media (min-width: 769px) { .undo-snack { left: auto; right: 24px; bottom: 24px; max-width: 360px; } }
+
+/* ---------- download progress cards ---------- */
+.dl-stack {
+  position: fixed; top: calc(var(--dl-top, 10px) + env(safe-area-inset-top, 0px)); left: 12px; right: 12px; z-index: 2500;
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+@media (min-width: 769px) { .dl-stack { left: auto; right: 24px; width: 340px; } }
+.dl-prog {
+  pointer-events: auto; padding: 10px 12px 12px; border-radius: 14px;
+  background: var(--bg-elevated); border: 1px solid var(--border); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  animation: dl-in 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.dl-prog:nth-child(n+4) { display: none; }
+.dl-prog.out { opacity: 0; transform: translate3d(0, -8px, 0); transition: opacity 0.2s ease, transform 0.2s ease; }
+.dl-prog-top { display: flex; align-items: center; gap: 10px; }
+.dl-prog-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dl-prog-pct { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.dl-prog-cancel { width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--bg-surface); color: var(--text-muted); font-size: 12px; }
+.dl-prog-bar { height: 4px; margin-top: 8px; border-radius: 2px; overflow: hidden; background: color-mix(in srgb, var(--text-main) 12%, transparent); }
+.dl-prog-fill { width: 100%; height: 100%; background: var(--accent); transform-origin: left center; transform: scaleX(0); transition: transform 0.35s linear; }
+.dl-prog.indeterminate .dl-prog-fill { width: 40%; transform: none; transition: none; animation: dl-slide 1.1s ease-in-out infinite; }
+@keyframes dl-in { from { opacity: 0; transform: translate3d(0, -12px, 0); } to { opacity: 1; transform: none; } }
+@keyframes dl-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+/* ---------- download panel: drag handle + "Download options" chip ---------- */
+.dock-handle { display: none; }
+.dock-reopen {
+  position: fixed; left: 50%; bottom: 16px; z-index: 1500; padding: 10px 18px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text-main);
+  font-size: 13px; font-weight: 600; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transform: translate3d(-50%, 20px, 0); opacity: 0; pointer-events: none;
+  transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
+}
+.dock-reopen.show { transform: translate3d(-50%, 0, 0); opacity: 1; pointer-events: auto; }
+
+@media (max-width: 768px) {
+  .dock-handle { display: block; position: relative; flex-shrink: 0; height: 22px; margin: -10px 0 -4px; touch-action: none; }
+  .dock-handle::after {
+    content: ''; position: absolute; left: 50%; top: 9px; width: 36px; height: 4px; margin-left: -18px;
+    border-radius: 2px; background: var(--text-muted); opacity: 0.45;
+  }
+  .dock-media { touch-action: none; }
+  body.nav-bottom .dock-reopen { bottom: calc(var(--nav-bottom) + 12px); }
+  body.nav-bottom .undo-snack { bottom: calc(var(--nav-bottom) + 14px); }
+}
+
+/* ---------- swipe pager (Modern layout) ---------- */
+@media (max-width: 768px) {
+  /* the browser keeps vertical scrolling; sideways drags are ours (needs pan-y, otherwise it claims them) */
+  body.nav-bottom .content-area, body.nav-bottom .music-view, body.nav-bottom .collections-view,
+  body.nav-bottom .history-view, body.nav-bottom .settings-view {
+    animation: none; touch-action: pan-y;
+  }
+  body.nav-bottom .top-header { touch-action: pan-y; }
+  body.nav-bottom .view-enter { animation: view-in 0.26s cubic-bezier(0.25, 1, 0.5, 1); }
+
+  /* while dragging, the next screen sits on the same area as the current one */
+  .main-view .pg-peek {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 100%;
+    margin-left: auto; margin-right: auto; pointer-events: none; will-change: transform;
+  }
+  .main-view .pg-peek.pg-head { bottom: auto; }
+  .main-view .pg-peek.pg-body { top: var(--pg-head, 0px); }
+  .main-view .pg-moving { will-change: transform; }
+  .bottom-nav.dragging .bn-indicator { transition: none; }
+}
+
+/* ---------- Settings as grouped rows (Modern layout) ---------- */
+@media (max-width: 768px) {
+  body.nav-bottom .setting-block {
+    background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  body.nav-bottom .setting-group-title { font-size: 15px; }
+  body.nav-bottom .setting-block.setting-row {
+    min-height: 60px; margin-bottom: 0; border-radius: 0; border-top-width: 0; cursor: pointer;
+  }
+  /* the first row of a run, and any row that stands alone, opens a group */
+  body.nav-bottom .setting-block:not(.setting-row) + .setting-row,
+  body.nav-bottom .setting-block.setting-row:first-child { border-top-width: 1px; border-radius: 16px 16px 0 0; }
+  /* the last row of a run closes it */
+  body.nav-bottom .setting-row:last-child { border-radius: 0 0 16px 16px; margin-bottom: 12px; }
+  body.nav-bottom .setting-row:has(+ :not(.setting-row)) { border-radius: 0 0 16px 16px; margin-bottom: 12px; }
+  /* a row that is both first and last is a full rounded card */
+  body.nav-bottom .setting-block:not(.setting-row) + .setting-row:last-child,
+  body.nav-bottom .setting-block:not(.setting-row) + .setting-row:has(+ :not(.setting-row)),
+  body.nav-bottom .setting-block.setting-row:first-child:last-child { border-radius: 16px; }
+}
+
+
+/* =========================================================
+   PART 12 - "..." action sheet, one-time tips
+   ========================================================= */
+.sheet-backdrop {
+  position: fixed; inset: 0; z-index: 3400; background: rgba(0, 0, 0, 0.5);
+  opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.sheet-backdrop.show { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 3500; max-width: 520px; margin: 0 auto;
+  padding: 0 8px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-elevated); border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0;
+  transform: translate3d(0, 100%, 0); transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform;
+}
+.sheet.show { transform: none; }
+.sheet-grabber { position: relative; height: 24px; touch-action: none; }
+.sheet-grabber::after {
+  content: ''; position: absolute; left: 50%; top: 10px; width: 36px; height: 4px; margin-left: -18px;
+  border-radius: 2px; background: var(--text-muted); opacity: 0.45;
+}
+.sheet-title {
+  padding: 0 16px 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; touch-action: none;
+}
+.sheet-item {
+  width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--text-main); font-size: 15px; font-weight: 500; text-align: left;
+}
+.sheet-item svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--text-muted); }
+.sheet-item:active { background: color-mix(in srgb, var(--text-main) 8%, transparent); }
+.sheet-item.danger, .sheet-item.danger svg { color: #ef4444; }
+
+
+@media (max-width: 768px) {
+  /* on phones the card keeps just the heart and the "..." button; the rest lives in the menu */
+  body.nav-bottom .track-actions .dl-btn,
+  body.nav-bottom .track-actions .add-btn { display: none; }
+}
+
+
+/* =========================================================
+   PART 13 - polish: swipe layer, collection toolbar, instant feedback
+   ========================================================= */
+
+/* the red delete layer only exists while a row is being swiped (it used to show through dimmed rows) */
+.swipe-bg { opacity: 0; transition: opacity 0.12s ease; }
+.swipe-wrap.swiping .swipe-bg { opacity: 1; }
+
+/* Collection toolbar: round back button, one clear main action, everything else behind "..." */
+.collections-toolbar { align-items: center; gap: 10px; margin: 4px 0 16px; }
+.mc-spacer { flex: 1; }
+.mc-icon {
+  width: 42px; height: 42px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-main);
+}
+.mc-icon svg { width: 20px; height: 20px; }
+.mc-primary {
+  height: 42px; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; border: 0; border-radius: 999px;
+  background: var(--accent); color: #000; font-size: 14px; font-weight: 700;
+}
+.mc-primary svg { width: 18px; height: 18px; }
+/* inside a collection the name is the screen's title, so it stays visible */
+body.nav-bottom .collections-view.in-collection #collectionsTitle { display: block; }
+.collection-item.checking .collection-note { opacity: 0.7; }
+
+/* things you touch answer on touch-down, no waiting for the finger to lift */
+.history-item:active, .track-card:active, .setting-row:active { scale: 0.985; }
+.track-action.like-btn svg { transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+.track-action.like-btn.liked svg { transform: scale(1.18); }
+
+/* play button spinner while a song is starting */
+.audio-player-bar .ctrl-play { position: relative; }
+.audio-player-bar.loading .ctrl-play svg { opacity: 0.2; }
+.audio-player-bar.loading .ctrl-play::after {
+  content: ''; position: absolute; inset: 8px; border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, currentColor 25%, transparent); border-top-color: currentColor;
+  animation: dl-spin 0.7s linear infinite;
+}
+@keyframes dl-spin { to { transform: rotate(360deg); } }
+
+
+/* =========================================================
+   PART 14 - mini player, download chip, colour circles + sliders,
+   playing rows, roomier phone layout
+   ========================================================= */
+
+/* ---------- mini player (the minimized music player, Modern layout) ---------- */
+.mini-player { display: none; }
+.mini-btn .i-pause { display: none; }
+.mini-btn.playing .i-pause { display: block; }
+.mini-btn.playing .i-play { display: none; }
+
+@media (max-width: 768px) {
+  body.nav-bottom .mini-player {
+    display: flex; position: fixed; left: 8px; right: 8px; bottom: calc(var(--nav-bottom) + 8px); z-index: 2050;
+    height: 58px; align-items: center; gap: 12px; padding: 6px 8px 6px 6px; overflow: hidden;
+    border-radius: 16px; background: var(--bg-elevated); border: 1px solid var(--border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    transform: translate3d(0, 24px, 0); opacity: 0; pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
+  }
+  body.nav-bottom .mini-player.visible { transform: none; opacity: 1; pointer-events: auto; }
+  body.nav-bottom .mini-player.dock-clash { bottom: calc(var(--nav-bottom) + 212px); }
+  .mini-art { width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px; object-fit: cover; background: #000; }
+  .mini-info { flex: 1; min-width: 0; }
+  .mini-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini-artist { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini-btn {
+    width: 44px; height: 44px; flex-shrink: 0; border: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; background: var(--accent); color: #000;
+  }
+  .mini-btn svg { width: 20px; height: 20px; }
+  .mini-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: color-mix(in srgb, var(--text-main) 12%, transparent); }
+  .mini-progress-fill { width: 100%; height: 100%; background: var(--accent); transform-origin: left center; transform: scaleX(0); transition: transform 0.5s linear; }
+
+  /* the old floating vinyl widget could end up under the bar or off screen; the mini player replaces it */
+  body.nav-bottom .minimized-vinyl-dock { display: none !important; }
+
+  /* with the mini player showing, lists end above it and floating messages sit higher */
+  body.nav-bottom.mini-visible .content-area,
+  body.nav-bottom.mini-visible .settings-view,
+  body.nav-bottom.mini-visible .history-view,
+  body.nav-bottom.mini-visible .collections-view,
+  body.nav-bottom.mini-visible .music-view { padding-bottom: calc(var(--nav-bottom) + 96px) !important; }
+  body.nav-bottom.mini-visible .undo-snack,
+  body.nav-bottom.mini-visible .dock-reopen { bottom: calc(var(--nav-bottom) + 76px); }
+}
+
+/* ---------- downloads: tuck the cards into one chip ---------- */
+.dl-pill {
+  display: none; align-self: flex-end; align-items: center; gap: 8px; pointer-events: auto;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg-elevated); color: var(--text-main); font-size: 13px; font-weight: 700;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.dl-pill svg { width: 16px; height: 16px; color: var(--accent); }
+.dl-stack.min:not(.empty) .dl-pill { display: inline-flex; animation: dl-in 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
+.dl-stack.min .dl-prog { display: none; }
+/* the chip is the first child, so allow three cards again */
+.dl-stack:not(.min) .dl-prog:nth-child(4) { display: block; }
+
+/* ---------- accent colour: circles and sliders ---------- */
+.swatch-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.swatch-row .theme-pill.swatch {
+  width: 36px; height: 36px; min-width: 0; padding: 0; border-radius: 50%;
+  background: var(--c); border: 2px solid transparent;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+}
+.swatch-row .theme-pill.swatch.active { border-color: var(--text-main); box-shadow: inset 0 0 0 3px var(--bg-surface); }
+.accent-sliders { margin-top: 16px; }
+.color-range {
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 22px;
+  margin: 12px 0 0; border-radius: 11px; outline: none; background: transparent;
+}
+.color-range.hue { background: linear-gradient(to right, hsl(0 75% 55%), hsl(60 75% 55%), hsl(120 75% 55%), hsl(180 75% 55%), hsl(240 75% 55%), hsl(300 75% 55%), hsl(360 75% 55%)); }
+.color-range.light { background: linear-gradient(to right, hsl(var(--h, 170) 75% 48%), hsl(var(--h, 170) 75% 72%)); }
+.color-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- the song that is playing, inside a collection ---------- */
+.collection-item.playing .history-title { color: var(--accent); }
+.collection-item.playing { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+
+/* ---------- Home: a welcome card that fills the space ---------- */
+.hero-icon {
+  width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent);
+}
+.hero-icon svg { width: 30px; height: 30px; }
+
+/* ---------- use the whole phone screen ---------- */
+@media (max-width: 768px) {
+  .empty-state { max-width: 100%; gap: 16px; }
+  .empty-hero-card { padding: 32px 20px; }
+  .empty-hero-card h2 { font-size: 26px; }
+  .empty-hero-card p { font-size: 15px; }
+  .empty-preview-grid { flex-wrap: wrap; }
+  .skeleton-chip { font-size: 13px; padding: 10px 18px; }
+  #centerPreview { max-width: 100%; }
+  #mediaSkeleton { max-width: 100% !important; }
+  body.nav-bottom .content-area, body.nav-bottom .settings-view, body.nav-bottom .history-view,
+  body.nav-bottom .collections-view, body.nav-bottom .music-view { padding-left: 14px !important; padding-right: 14px !important; }
+  .download-dock { width: calc(100% - 16px); max-width: 560px; touch-action: pan-x; }
+}
+
+
+/* =========================================================
+   PART 15 - theme circles + theme maker, calmer Home layout, animations
+   ========================================================= */
+
+/* ---------- theme circles ---------- */
+.theme-swatches { display: flex; flex-wrap: wrap; gap: 14px 10px; margin-top: 4px; }
+.theme-swatches .theme-pill.tswatch {
+  width: 58px; min-width: 0; padding: 0; border: 0; background: transparent; color: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; border-radius: 12px;
+}
+.theme-swatches .theme-pill.tswatch.active { background: transparent; color: inherit; border-color: transparent; }
+.tdot {
+  width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--bg) 0 50%, var(--sf) 50% 100%);
+  border: 2px solid color-mix(in srgb, var(--text-main) 18%, transparent);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.tswatch.active .tdot { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+.tlabel { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.tswatch.active .tlabel { color: var(--text-main); }
+/* the white circle with a black plus */
+.tcustom .tdot { background: #fff; color: #000; }
+.plus-sign { font-size: 28px; line-height: 1; font-weight: 500; margin-top: -2px; }
+.tcustom.has-custom .tdot { background: linear-gradient(135deg, var(--bg) 0 50%, var(--sf) 50% 100%); }
+.tcustom.has-custom .plus-sign { display: none; }
+
+/* ---------- theme maker (bottom sheet with a colour wheel) ---------- */
+@property --a { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+
+.te-backdrop {
+  position: fixed; inset: 0; z-index: 3400; background: rgba(0, 0, 0, 0.4);
+  opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.te-backdrop.show { opacity: 1; pointer-events: auto; }
+.te-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 3500; max-width: 520px; margin: 0 auto;
+  max-height: 92vh; overflow-y: auto; padding: 0 8px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-elevated); border: 1px solid var(--border); border-bottom: 0; border-radius: 22px 22px 0 0;
+  transform: translate3d(0, 100%, 0); transition: transform 0.34s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform;
+}
+.te-sheet.show { transform: none; }
+.te-title { text-align: center; font-size: 16px; font-weight: 800; padding: 0 16px 4px; }
+
+/* a thick colour ring, a glowing centre in the chosen colour, one round knob */
+.wheel { --r: 88px; position: relative; width: 230px; height: 230px; margin: 12px auto 18px; touch-action: none; -webkit-user-select: none; user-select: none; }
+.wheel-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, hsl(0 85% 55%), hsl(60 85% 50%), hsl(120 70% 45%), hsl(180 80% 48%), hsl(240 85% 60%), hsl(300 75% 58%), hsl(360 85% 55%));
+  -webkit-mask: radial-gradient(circle, transparent 60px, #000 61.5px); mask: radial-gradient(circle, transparent 60px, #000 61.5px);
+}
+.wheel-orb {
+  position: absolute; left: 50%; top: 50%; width: 88px; height: 88px; margin: -44px 0 0 -44px; border-radius: 50%;
+  background: hsl(var(--hue, 190) 85% 55%); box-shadow: 0 0 36px hsl(var(--hue, 190) 85% 55% / 0.45);
+}
+.wheel-knob {
+  --a: 0deg;
+  position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; border-radius: 50%; scale: 1;
+  background: hsl(var(--hue, 190) 85% 55%); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(var(--r) * -1));
+  transition: --a 0.28s cubic-bezier(0.25, 1, 0.5, 1), scale 0.15s ease;           /* taps glide, drags (below) do not */
+  will-change: transform;
+}
+.te-sheet.dragging .wheel-knob { transition: scale 0.15s ease; scale: 1.12; }
+
+.te-row { display: flex; align-items: center; gap: 14px; padding: 0 16px; font-size: 14px; font-weight: 600; }
+.te-row .color-range { flex: 1; margin: 0; }
+.color-range.tint { background: linear-gradient(to right, hsl(var(--hue, 190) 20% 30%), hsl(var(--hue, 190) 100% 40%)); }
+.te-modes { padding: 14px 16px 0; justify-content: center; }
+.te-actions { display: flex; gap: 10px; padding: 18px 16px 4px; }
+.te-actions .app-dialog-btn { flex: 1; padding: 13px; font-size: 15px; }
+
+/* ---------- Home: with a link loaded the preview sits at the top; the stack below leaves room ---------- */
+@media (max-width: 768px) {
+  body.nav-bottom.has-media .content-area { justify-content: flex-start; padding-top: 10px !important; }
+  body.nav-bottom.has-media .content-area { padding-bottom: calc(var(--nav-bottom) + 270px) !important; }
+  body.nav-bottom.has-media.mini-visible .content-area { padding-bottom: calc(var(--nav-bottom) + 340px) !important; }
+  /* order from the bottom: bar, mini player, download panel */
+  body.nav-bottom .mini-player.dock-clash { bottom: calc(var(--nav-bottom) + 8px); }
+  body.nav-bottom.mini-visible .download-dock.active { bottom: calc(var(--nav-bottom) + 74px); }
+  .dock-thumb { width: 44px; height: 44px; }
+  .download-dock { gap: 8px; padding: 10px 12px; }
+  .btn-action { padding: 9px 6px; }
+}
+
+/* ---------- animations (movement and fading only, so they stay smooth) ---------- */
+@keyframes pop-in { from { opacity: 0; transform: scale(0.94) translate3d(0, 8px, 0); } to { opacity: 1; transform: none; } }
+@keyframes fade-up { from { opacity: 0; transform: translate3d(0, 10px, 0); } to { opacity: 1; transform: none; } }
+@keyframes fade-only { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
+
+/* dialogs, settings pages, the link preview and the welcome card ease in instead of popping */
+.app-dialog { animation: pop-in 0.24s cubic-bezier(0.25, 1, 0.5, 1); }
+.app-dialog-backdrop { animation: fade-only 0.2s ease; }
+.settings-pane { animation: fade-up 0.24s cubic-bezier(0.25, 1, 0.5, 1); }
+#centerPreview, #mediaSkeleton { animation: fade-up 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+.empty-hero-card { animation: fade-up 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+
+/* lists: items rise in one after another when a screen (or a collection) opens */
+.view-enter #historyList > *, .view-enter #collectionsGrid > *, .view-enter #collectionsList > *,
+.view-enter #musicGrid > *, .view-enter .settings-pane > .setting-block {
+  animation: rise 0.34s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+.view-enter #historyList > :nth-child(2), .view-enter #collectionsGrid > :nth-child(2), .view-enter #collectionsList > :nth-child(2),
+.view-enter #musicGrid > :nth-child(2), .view-enter .settings-pane > .setting-block:nth-child(2) { animation-delay: 35ms; }
+.view-enter #historyList > :nth-child(3), .view-enter #collectionsGrid > :nth-child(3), .view-enter #collectionsList > :nth-child(3),
+.view-enter #musicGrid > :nth-child(3), .view-enter .settings-pane > .setting-block:nth-child(3) { animation-delay: 70ms; }
+.view-enter #historyList > :nth-child(4), .view-enter #collectionsGrid > :nth-child(4), .view-enter #collectionsList > :nth-child(4),
+.view-enter #musicGrid > :nth-child(4), .view-enter .settings-pane > .setting-block:nth-child(4) { animation-delay: 105ms; }
+.view-enter #historyList > :nth-child(5), .view-enter #collectionsGrid > :nth-child(5), .view-enter #collectionsList > :nth-child(5),
+.view-enter #musicGrid > :nth-child(5), .view-enter .settings-pane > .setting-block:nth-child(5) { animation-delay: 140ms; }
+.view-enter #historyList > :nth-child(6), .view-enter #collectionsGrid > :nth-child(6), .view-enter #collectionsList > :nth-child(6),
+.view-enter #musicGrid > :nth-child(6), .view-enter .settings-pane > .setting-block:nth-child(6) { animation-delay: 175ms; }
+.view-enter #historyList > :nth-child(n+7), .view-enter #collectionsGrid > :nth-child(n+7), .view-enter #collectionsList > :nth-child(n+7),
+.view-enter #musicGrid > :nth-child(n+7), .view-enter .settings-pane > .setting-block:nth-child(n+7) { animation-delay: 210ms; }
