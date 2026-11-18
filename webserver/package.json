@@ -1,12 +1,14 @@
 {
-  "name": "Downloaderhub",
+  "name": "downloaderhub",
   "version": "2.4.3",
-  "private": true,
+  "description": "Self-hosted media downloader, music player, and link organizer.",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
+  "license": "AGPL-3.0-only",
   "dependencies": {
-    "express": "^4.21.0",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
   }
 }
