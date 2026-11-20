@@ -50,8 +50,13 @@ object DownloadTracker {
     fun end(ctx: Context, processId: String) {
         active.remove(processId)
         if (active.isEmpty()) {
-            ctx.stopService(Intent(ctx, DownloadService::class.java))
-            serviceRunning = false
+            // If the service has not reached startForeground() yet, stopping it now would crash the app
+            // ("did not then call Service.startForeground()"). In that case the service stops itself as
+            // soon as it starts and sees that nothing is running.
+            if (DownloadService.inForeground) {
+                ctx.stopService(Intent(ctx, DownloadService::class.java))
+                serviceRunning = false
+            }
             cancelled.clear()
         } else {
             DownloadService.update(ctx)
@@ -100,6 +105,7 @@ class DownloadService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_CANCEL) {
             DownloadTracker.cancelAll()
+            if (DownloadTracker.count() == 0) stopSelf()      // nothing left to cancel: do not leave an idle service behind
             return START_NOT_STICKY
         }
         ensureChannel(this)
@@ -109,10 +115,13 @@ class DownloadService : Service() {
         } else {
             startForeground(NOTIF_ID, notification)
         }
+        inForeground = true
+        if (DownloadTracker.count() == 0) stopSelf()          // the download already ended while we were starting
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        inForeground = false
         DownloadTracker.serviceStopped()
         super.onDestroy()
     }
@@ -121,6 +130,7 @@ class DownloadService : Service() {
         private const val CHANNEL_ID = "downloads"
         private const val NOTIF_ID = 4201
         const val ACTION_CANCEL = "com.kyz.downloaderhub.CANCEL_DOWNLOADS"
+        @Volatile var inForeground = false
 
         private fun ensureChannel(ctx: Context) {
             if (Build.VERSION.SDK_INT < 26) return

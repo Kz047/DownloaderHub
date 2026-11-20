@@ -30,7 +30,7 @@
 
     <div class="nav-group">
         <button class="nav-item active" id="navHome" title="Home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            <svg viewBox="5 17 80 80" fill="currentColor" stroke="none" aria-hidden="true"><g transform="rotate(-8 45 55)"><path d="M17 33A28 7.5 0 0 0 73 33L68 58Q66 72 54 72H36Q24 72 22 58ZM17 33A28 7.5 0 1 1 73 33A28 7.5 0 1 1 17 33ZM22 33A23 5 0 1 0 68 33A23 5 0 1 0 22 33ZM70 44h4a9 9 0 0 1 0 18h-6v-4.5h6a4.5 4.5 0 0 0 0-9h-4ZM43 46V55H38.5L45 62.5L51.5 55H47V46ZM38 65v2.6h14V65Z"/></g><path d="M11 83A34 6.5 0 1 1 79 83A34 6.5 0 1 1 11 83Z"/></svg>
             <span>Home</span>
         </button>
 
@@ -77,7 +77,7 @@
 <nav class="bottom-nav" id="bottomNav" aria-label="Main">
     <span class="bn-indicator" aria-hidden="true"></span>
     <button class="bn-item active" data-view="home" aria-label="Home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <svg viewBox="5 17 80 80" fill="currentColor" stroke="none" aria-hidden="true"><g transform="rotate(-8 45 55)"><path d="M17 33A28 7.5 0 0 0 73 33L68 58Q66 72 54 72H36Q24 72 22 58ZM17 33A28 7.5 0 1 1 73 33A28 7.5 0 1 1 17 33ZM22 33A23 5 0 1 0 68 33A23 5 0 1 0 22 33ZM70 44h4a9 9 0 0 1 0 18h-6v-4.5h6a4.5 4.5 0 0 0 0-9h-4ZM43 46V55H38.5L45 62.5L51.5 55H47V46ZM38 65v2.6h14V65Z"/></g><path d="M11 83A34 6.5 0 1 1 79 83A34 6.5 0 1 1 11 83Z"/></svg>
         <span>Home</span>
     </button>
     <button class="bn-item" data-view="music" aria-label="Music">
@@ -542,6 +542,9 @@
             <button class="btn-action btn-audio" data-type="audio" id="btnAudio">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Audio
             </button>
+            <button class="btn-action btn-video" id="btnSaveImage">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> <span>Save photo</span>
+            </button>
             <button class="btn-action btn-video" data-type="video" id="btnVideo">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Video
             </button>
@@ -553,6 +556,7 @@
     <div class="mini-player" id="miniPlayer">
         <img class="mini-art" id="miniArt" src="" alt="">
         <div class="mini-info"><div class="mini-title" id="miniTitle"></div><div class="mini-artist" id="miniArtist"></div></div>
+        <span class="eq mini-eq" aria-hidden="true"><i></i><i></i><i></i></span>
         <button class="mini-btn" id="miniPlayBtn" aria-label="Play or pause">
             <svg class="i-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
             <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>
@@ -643,16 +647,11 @@
         <div class="done-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
-        <h3 id="doneTitle">Download complete</h3>
-        <ul class="done-files" id="doneFiles"></ul>
+        <h3 id="doneTitle">Download Complete</h3>
+        <p class="done-file" id="doneFile"></p>
         <p class="done-note" id="doneNote" style="display: none;"></p>
-        <div class="done-where">
-            <div class="done-where-title">Where to find it</div>
-            <div class="done-path">Files app &rsaquo; Downloads &rsaquo; <b>DownloaderHub</b></div>
-            <div class="done-hint">If the folder is not there yet, wait a moment or pull down to refresh the Files app.</div>
-        </div>
         <div class="app-dialog-actions">
-            <button class="app-dialog-btn primary" id="doneOk">OK</button>
+            <button class="app-dialog-btn primary" id="doneShare">Share</button>
         </div>
     </div>
 </div>
@@ -665,7 +664,7 @@
         <div class="welcome-steps">
             <section class="welcome-step active">
                 <div class="welcome-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <svg viewBox="5 17 80 80" fill="currentColor" stroke="none" aria-hidden="true"><g transform="rotate(-8 45 55)"><path d="M17 33A28 7.5 0 0 0 73 33L68 58Q66 72 54 72H36Q24 72 22 58ZM17 33A28 7.5 0 1 1 73 33A28 7.5 0 1 1 17 33ZM22 33A23 5 0 1 0 68 33A23 5 0 1 0 22 33ZM70 44h4a9 9 0 0 1 0 18h-6v-4.5h6a4.5 4.5 0 0 0 0-9h-4ZM43 46V55H38.5L45 62.5L51.5 55H47V46ZM38 65v2.6h14V65Z"/></g><path d="M11 83A34 6.5 0 1 1 79 83A34 6.5 0 1 1 11 83Z"/></svg>
                 </div>
                 <h2>Welcome to DownloaderHub</h2>
                 <p>Paste a link, pick a quality, and save it to your device. No sketchy websites in between.</p>
@@ -745,7 +744,7 @@
     <div class="te-title">Custom theme</div>
     <div class="wheel" id="themeWheel">
         <div class="wheel-ring"></div>
-        <div class="wheel-orb"></div>
+        <div class="wheel-orb"><span id="themeName"></span></div>
         <div class="wheel-knob" id="themeKnob"></div>
     </div>
     <div class="te-row"><span>Strength</span><input type="range" class="color-range tint" id="themeTint" min="20" max="100" step="1" aria-label="Color strength"></div>
@@ -1027,7 +1026,7 @@
             <span class="history-meta">
               <span class="history-platform">${escHtml(entry.platform || '')}</span>
               <span>•</span>
-              <span>${entry.type === 'audio' ? 'Audio' : escHtml(entry.resolution || 'Video')}</span>
+              <span>${entry.type === 'audio' ? 'Audio' : entry.type === 'image' ? 'Photo' : escHtml(entry.resolution || 'Video')}</span>
               <span>•</span>
               <span>${formatHistoryDate(entry.timestamp)}</span>
             </span>
@@ -1102,6 +1101,10 @@
     }
 
     function applySettings(settings) {
+      // colours change with a soft cross-fade instead of a hard cut
+      const look = [settings.theme, settings.accentColor, JSON.stringify(settings.customTheme || null)].join('|');
+      if (window.__lastLook && window.__lastLook !== look && !settings.reduceMotion) softColorChange();
+      window.__lastLook = look;
       document.documentElement.style.setProperty('--accent', settings.accentColor);
 
       const t = settings.theme === 'custom' ? buildCustomTheme(settings.customTheme) : (THEMES[settings.theme] || THEMES.system);
@@ -1553,6 +1556,7 @@
 
       emptyState.style.display = 'none';
       mediaSkeleton.style.display = 'flex';
+      setFetching(true);
       dockShouldBeVisible = false;
       dockDismissed = false;
       downloadDock.classList.remove('active');
@@ -1577,6 +1581,7 @@
         activeMediaData = data;
 
         mediaSkeleton.style.display = 'none';
+        setFetching(false);
 
         const thumbUrl = data.thumbnail || PLACEHOLDER_IMG;
         dockThumb.src = thumbUrl;
@@ -1586,8 +1591,13 @@
         platformLabel.href = url;
 
         isPlaylistMode = data.isPlaylist;
+        downloadDock.classList.remove('image-mode');
+        centerPreview.classList.remove('image-preview');
+        imagePost = null;
 
-        if (isPlaylistMode) {
+        if (data.isImagePost) {
+          setupImagePost(data);
+        } else if (isPlaylistMode) {
           duration.textContent = `${data.entries.length} items`;
           playlistContainer.classList.add('visible');
           playlistCount.textContent = `${data.entries.length} videos found`;
@@ -1625,6 +1635,7 @@
         updateDockReopen();
       } catch (err) {
         mediaSkeleton.style.display = 'none';
+        setFetching(false);
         showToast(err.message || 'Failed to fetch media details.', 'error');
         emptyState.style.display = 'flex';
       }
@@ -1647,25 +1658,41 @@
       });
     }
 
+    // Only the qualities this link really has (read from its format list), not a fixed 360p-4K row.
     function buildStrictResSelector(formats) {
       resSelector.innerHTML = '';
-      const targetResolutions = ['360p', '480p', '720p', '1080p', '4K'];
       const dq = getSettings().defaultQuality || '1080p';
-      const defaultRes = dq === '2160p' ? '4K' : dq; // comes from Settings > Default Video Quality
+      const wantedH = parseInt(dq, 10) || 1080;           // '2160p' -> 2160
 
-      targetResolutions.forEach((res) => {
+      // real video heights only: skip audio-only entries and storyboard thumbnails (mhtml)
+      const set = new Set();
+      (formats || []).forEach((f) => {
+        const h = parseInt(f && f.resolution, 10);
+        if (!(h >= 144)) return;
+        if (f.ext === 'mhtml' || f.vcodec === 'none' || f.vcodec == null) return;
+        set.add(h);
+      });
+      let heights = Array.from(set).sort((x, y) => x - y);
+      if (heights.length > 6) heights = heights.slice(-6);  // keep the 6 highest
+
+      // nothing readable (some sites hide formats): one "Best" chip, the app picks the best itself
+      const options = heights.length
+        ? heights.map((h) => ({ label: h === 2160 ? '4K' : h + 'p', id: h + 'p', h }))
+        : [{ label: 'Best', id: '', h: 0 }];
+
+      // default = the highest quality not above the one chosen in Settings, else the lowest available
+      let pick = options[0];
+      options.forEach((o) => { if (o.h && o.h <= wantedH) pick = o; });
+      selectedFormatId = pick.id;
+
+      options.forEach((o) => {
         const el = document.createElement('div');
-        const isSelected = res === defaultRes;
-        el.className = 'chip' + (isSelected ? ' selected' : '');
-        const backendFormat = res === '4K' ? '2160p' : res;
-
-        if (isSelected) selectedFormatId = backendFormat;
-
-        el.textContent = res;
+        el.className = 'chip' + (o === pick ? ' selected' : '');
+        el.textContent = o.label;
         el.addEventListener('click', () => {
           resSelector.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
           el.classList.add('selected');
-          selectedFormatId = backendFormat;
+          selectedFormatId = o.id;
         });
         resSelector.appendChild(el);
       });
@@ -1698,8 +1725,9 @@
         });
         // One popup when the whole batch is done
         Promise.all(jobs).then((results) => {
-          const names = results.filter((r) => r && r.ok).map((r) => r.name);
-          reportDownloads(names, results.length - names.length);
+          const okResults = results.filter((r) => r && r.ok);
+          const names = okResults.map((r) => r.name);
+          reportDownloads(names, results.length - names.length, okResults.map((r) => r.uri || null));
         });
       }
     }
@@ -1753,9 +1781,9 @@
 
         if (card) { card.update(100); card.remove(900); }
         haptic('confirm');
-        if (hasNativeApi()) { if (!opts.quiet) reportDownloads([savedName]); }
+        if (hasNativeApi()) { if (!opts.quiet) reportDownloads([savedName], 0, [savedUri]); }
         else if (!opts.quiet) showToast('Download started.', '');
-        return { ok: true, name: savedName };
+        return { ok: true, name: savedName, uri: savedUri };
       } catch (err) {
         if (card) card.remove();
         if (/cancelled/i.test(err.message || '')) showToast('Download cancelled.', '');
@@ -1874,47 +1902,49 @@
       if (e.key === 'Enter' && e.target !== dlg.cancel) { e.preventDefault(); dlg.ok.click(); }
     });
 
-    // ================= "Download complete" popup (phone app only) =================
+    // ================= "Download Complete" popup (phone app only) =================
     const doneDlg = {
       el: document.getElementById('doneDialog'),
       title: document.getElementById('doneTitle'),
-      files: document.getElementById('doneFiles'),
+      file: document.getElementById('doneFile'),
       note: document.getElementById('doneNote'),
-      ok: document.getElementById('doneOk')
+      share: document.getElementById('doneShare')
     };
     let doneNames = [];
+    let doneUris = [];
     let doneFailed = 0;
 
+    const mimeOf = (name) => {
+      const n = name || '';
+      if (/\.mp3$/i.test(n)) return 'audio/mpeg';
+      if (/\.jpe?g$/i.test(n)) return 'image/jpeg';
+      if (/\.png$/i.test(n)) return 'image/png';
+      if (/\.webp$/i.test(n)) return 'image/webp';
+      if (/\.gif$/i.test(n)) return 'image/gif';
+      if (/\.avif$/i.test(n)) return 'image/avif';
+      return 'video/mp4';
+    };
+
     function renderDone() {
-      const saved = doneNames.length;
-      doneDlg.title.textContent = doneFailed ? 'Downloads finished'
-        : saved === 1 ? 'Download complete'
-        : saved + ' downloads complete';
-      doneDlg.files.innerHTML = '';
-      doneNames.slice(0, 4).forEach((n) => {
-        const li = document.createElement('li');
-        li.textContent = n;
-        doneDlg.files.appendChild(li);
-      });
-      if (saved > 4) {
-        const li = document.createElement('li');
-        li.className = 'more';
-        li.textContent = '+ ' + (saved - 4) + ' more';
-        doneDlg.files.appendChild(li);
-      }
+      const n = doneNames.length;
+      doneDlg.title.textContent = n > 1 ? n + ' Downloads Complete' : 'Download Complete';
+      doneDlg.file.textContent = n === 1 ? doneNames[0] : doneNames[n - 1] + (n > 1 ? '  +' + (n - 1) + ' more' : '');
       doneDlg.note.style.display = doneFailed ? 'block' : 'none';
-      doneDlg.note.textContent = doneFailed
-        ? doneFailed + (doneFailed === 1 ? ' download' : ' downloads') + ' could not be saved.'
-        : '';
+      doneDlg.note.textContent = doneFailed ? doneFailed + (doneFailed === 1 ? ' download' : ' downloads') + ' could not be saved.' : '';
+      // Share needs the saved files' addresses (Android 10+); without them the button just closes the popup
+      const canShare = doneUris.some(Boolean) && !!(window.AndroidBridge && window.AndroidBridge.shareFile);
+      doneDlg.share.textContent = canShare ? 'Share' : 'OK';
+      doneDlg.share.dataset.mode = canShare ? 'share' : 'close';
     }
     function closeDone() {
       doneDlg.el.style.display = 'none';
       doneNames = [];
+      doneUris = [];
       doneFailed = 0;
     }
-    // names: file names that were saved; failed: how many in the same batch did not work.
+    // names: file names that were saved; failed: how many in the same batch did not work; uris: addresses of the saved files.
     // If the popup is already open, new files are added to it instead of stacking popups.
-    function reportDownloads(names, failed) {
+    function reportDownloads(names, failed, uris) {
       if (!hasNativeApi()) return;               // in a browser, the browser shows its own download message
       if (!names || !names.length) return;
       if (getSettings().donePopup === false) {
@@ -1922,15 +1952,26 @@
         return;
       }
       doneNames = doneNames.concat(names);
+      doneUris = doneUris.concat(uris && uris.length === names.length ? uris : names.map(() => null));
       doneFailed += failed || 0;
       renderDone();
       doneDlg.el.style.display = 'flex';
-      setTimeout(() => doneDlg.ok.focus(), 30);
+      setTimeout(() => doneDlg.share.focus(), 30);
     }
-    doneDlg.ok.addEventListener('click', closeDone);
+    doneDlg.share.addEventListener('click', () => {
+      if (doneDlg.share.dataset.mode === 'share') {
+        const good = doneUris.map((u, i) => ({ u, n: doneNames[i] })).filter(x => x.u);
+        if (good.length === 1) {
+          window.AndroidBridge.shareFile(good[0].u, mimeOf(good[0].n));
+        } else if (window.AndroidBridge.shareFiles) {
+          window.AndroidBridge.shareFiles(JSON.stringify(good.map(x => x.u)), '*/*');
+        }
+      }
+      closeDone();
+    });
     doneDlg.el.addEventListener('click', (e) => { if (e.target === doneDlg.el) closeDone(); });
     doneDlg.el.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); closeDone(); }
+      if (e.key === 'Escape') { e.preventDefault(); closeDone(); }
     });
 
     // ================= Shared helpers =================
@@ -2053,7 +2094,7 @@
       return col;
     }
     function statusNote(item) {
-      const what = item.type === 'audio' ? 'Music' : 'Video';
+      const what = item.type === 'audio' ? 'Music' : item.type === 'image' ? 'Photo' : 'Video';
       switch (item.status) {
         case 'removed': return `(${what} deleted)`;
         case 'private': return '(Private)';
@@ -2127,6 +2168,7 @@
 
     // ----- quick download (used by Collections + music cards) -----
     async function quickDownload(item, opts = {}) {
+      if (item.type === 'image') return quickImage(item, opts);
       const type = item.type === 'audio' ? 'audio' : 'video';
       const quality = getSettings().defaultQuality || '1080p';
       const card = hasNativeApi() ? addDlProgress(item.title || extractLinkId(item.url)) : null;   // shows at once
@@ -2158,10 +2200,10 @@
         if (card) { card.update(100); card.remove(900); }
         if (opts.toast !== false) {
           haptic('confirm');
-          if (hasNativeApi()) reportDownloads([savedName]);
+          if (hasNativeApi()) reportDownloads([savedName], 0, [savedUri]);
           else showToast('Download started.');
         }
-        return { ok: true, name: savedName };
+        return { ok: true, name: savedName, uri: savedUri };
       } catch (err) {
         if (card) card.remove();
         if (err.reason === 'removed' || err.reason === 'private') markItemStatus(item.url, err.reason);
@@ -2367,16 +2409,17 @@
       if (!ok) return;
       let done = 0, failed = 0;
       const savedNames = [];
+      const savedUris = [];
       for (let i = 0; i < items.length; i++) {
         collectionBusy = { id: col.id, text: `Downloading ${i + 1} of ${items.length}…` };
         renderCollections();
         const r = await quickDownload(items[i], { toast: false });
-        if (r.ok) { done++; savedNames.push(r.name); } else { failed++; }
+        if (r.ok) { done++; savedNames.push(r.name); savedUris.push(r.uri || null); } else { failed++; }
         if (i < items.length - 1) await sleep(900);
       }
       collectionBusy = null;
       renderCollections();
-      if (hasNativeApi() && savedNames.length) reportDownloads(savedNames, failed);
+      if (hasNativeApi() && savedNames.length) reportDownloads(savedNames, failed, savedUris);
       else showToast(`Saved ${done}${failed ? `, ${failed} failed` : ''}.`, failed ? 'error' : '');
     }
 
@@ -2427,6 +2470,7 @@
           <div class="track-art-wrapper">
             <img src="${escHtml(track.thumbnail || PLACEHOLDER_IMG)}" class="track-art">
           </div>
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
           <div class="track-overlay"><div class="track-play-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div></div>
           <div class="track-actions">
             <button class="track-action dl-btn" title="Download MP3">${DOWNLOAD_SVG}</button>
@@ -2467,6 +2511,7 @@
         e.stopPropagation();
         toggleLike(track);
         likeBtn.classList.toggle('liked', isLiked(track.id));
+        likeBtn.classList.remove('pop'); void likeBtn.offsetWidth; likeBtn.classList.add('pop');
         if (musicSection === 'liked') renderMusicSection();
       });
       return card;
@@ -2796,6 +2841,8 @@
       audioPlayIconSvg.style.display = isPlaying ? 'none' : 'block';
       audioPauseIconSvg.style.display = isPlaying ? 'block' : 'none';
       document.getElementById('miniPlayBtn').classList.toggle('playing', isPlaying);
+      document.getElementById('miniPlayer').classList.toggle('is-playing', isPlaying);
+      audioPlayerBar.classList.toggle('is-playing', isPlaying);
       document.querySelectorAll('.track-card').forEach(c => {
         c.classList.toggle('playing', isPlaying && !!currentMusicTrack && c.dataset.trackId === currentMusicTrack.id);
       });
@@ -2894,7 +2941,7 @@
         title: activeMediaData.title,
         thumbnail: activeMediaData.thumbnail,
         platform: detectPlatform(url),
-        type: /music\.youtube\.com/i.test(url) ? 'audio' : 'video'
+        type: activeMediaData.isImagePost ? 'image' : (/music\.youtube\.com/i.test(url) ? 'audio' : 'video')
       }, btnSave);
     });
 
@@ -3482,7 +3529,7 @@
     })();
 
     // ---------- Download progress cards (phone app) ----------
-    // Swipe a card up or down to tuck all of them into one small chip; tap the chip to bring them back.
+    // Swipe a card in any direction to tuck all of them into one small chip (download icon and percentage); tap the chip to bring them back.
     function refreshDlPill() {
       const stack = document.getElementById('dlStack');
       const cards = Array.from(stack.querySelectorAll('.dl-prog:not(.out)'));
@@ -3490,22 +3537,25 @@
       if (!cards.length) { stack.classList.remove('min'); return; }
       const known = cards.map(c => parseFloat(c.dataset.pct)).filter(p => p >= 0);
       const pct = known.length ? Math.round(known.reduce((a, b) => a + b, 0) / known.length) : null;
-      document.getElementById('dlPillText').textContent =
-        (cards.length > 1 ? cards.length + ' downloads' : 'Downloading') + (pct !== null ? ' \u00b7 ' + pct + '%' : '');
+      document.getElementById('dlPillText').textContent = pct !== null ? pct + '%' : '\u2026';
     }
     (function setupDlCardSwipe() {
       const stack = document.getElementById('dlStack');
-      let y0 = 0, dy = 0, card = null;
+      let x0 = 0, y0 = 0, dx = 0, dy = 0, card = null, axis = null;
       stack.addEventListener('touchstart', (e) => {
         card = e.target.closest('.dl-prog');
         if (!card || e.target.closest('button')) { card = null; return; }
-        y0 = e.touches[0].clientY; dy = 0;
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = dy = 0; axis = null;
         card.style.transition = 'none';
       }, { passive: true });
       stack.addEventListener('touchmove', (e) => {
         if (!card) return;
-        dy = e.touches[0].clientY - y0;
-        card.style.translate = `0 ${clamp(dy, -60, 60)}px`;
+        dx = e.touches[0].clientX - x0; dy = e.touches[0].clientY - y0;
+        if (!axis) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) < 8) return;
+          axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';                 // follow whichever way the finger goes
+        }
+        card.style.translate = axis === 'x' ? `${clamp(dx, -90, 90)}px 0` : `0 ${clamp(dy, -60, 60)}px`;
       }, { passive: true });
       const end = () => {
         if (!card) return;
@@ -3513,7 +3563,7 @@
         card = null;
         c.style.transition = 'translate 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
         c.style.translate = '';
-        if (Math.abs(dy) > 36) { stack.classList.add('min'); haptic('tick'); }
+        if ((axis === 'x' && Math.abs(dx) > 40) || (axis === 'y' && Math.abs(dy) > 36)) { stack.classList.add('min'); haptic('tick'); }
       };
       stack.addEventListener('touchend', end);
       stack.addEventListener('touchcancel', end);
@@ -3536,7 +3586,7 @@
       return api('/api/download', reqOpts);
     }
 
-    function addDlProgress(title) {
+    function addDlProgress(title, opts = {}) {
       const stack = document.getElementById('dlStack');
       if (!stack) return null;
       const el = document.createElement('div');
@@ -3546,6 +3596,7 @@
         '<button class="dl-prog-cancel" aria-label="Cancel download">\u2715</button></div>' +
         '<div class="dl-prog-bar"><div class="dl-prog-fill"></div></div>';
       el.querySelector('.dl-prog-title').textContent = title || 'Downloading';
+      if (opts.noCancel) el.querySelector('.dl-prog-cancel').style.display = 'none';
       stack.appendChild(el);
       refreshDlPill();
       const fill = el.querySelector('.dl-prog-fill');
@@ -3557,7 +3608,8 @@
           el.classList.remove('indeterminate');
           el.dataset.pct = String(p);
           fill.style.transform = `scaleX(${Math.min(100, p) / 100})`;
-          pctEl.textContent = Math.round(p) + '%';
+          pctEl.textContent = p >= 100 ? '\u2713' : Math.round(p) + '%';
+          el.classList.toggle('done', p >= 100);
           refreshDlPill();
         },
         remove(delay = 0) {
@@ -3702,7 +3754,7 @@
 
     // ---------- the menus ----------
     function openHistoryMenu(entry, anchor) {
-      const type = entry.type === 'audio' ? 'audio' : 'video';
+      const type = entry.type === 'audio' ? 'audio' : entry.type === 'image' ? 'image' : 'video';
       const hasFile = hasNativeApi() && !!entry.fileUri;
       Sheet.show(entry.title || 'Untitled', [
         hasFile && { label: 'Open file', icon: OPEN_SVG, run: () => fileAction('open', entry) },
@@ -3945,39 +3997,53 @@
     }
 
     // ---------- the editor: a colour wheel, a strength slider, dark / light, Save ----------
+    // While you drag, only the ring's own little parts change (cheap). The whole app takes the new colours when you let go.
     const ThemeEditor = (() => {
       const sheet = document.getElementById('themeEditor');
       const backdrop = document.getElementById('themeEditorBackdrop');
       const wheel = document.getElementById('themeWheel');
       const knob = document.getElementById('themeKnob');
+      const nameEl = document.getElementById('themeName');
       const tint = document.getElementById('themeTint');
       const modeBtns = sheet.querySelectorAll('[data-tmode]');
+      const NAMES = [[12, 'Red'], [40, 'Orange'], [65, 'Yellow'], [90, 'Lime'], [150, 'Green'], [170, 'Mint'], [182, 'Teal'], [207, 'Cyan'],
+                     [228, 'Sky'], [258, 'Blue'], [278, 'Indigo'], [298, 'Violet'], [322, 'Purple'], [342, 'Magenta'], [354, 'Pink'], [361, 'Red']];
+      const nameOf = (hue) => NAMES.find(([limit]) => hue < limit)[1];
+
       let state = { a: 190, h: 190, s: 60, mode: 'dark' };      // a = knob angle (keeps counting), h = hue 0-359
       let isOpen = false;
       let frame = null;
+      let rect = null;                                          // the wheel's position, measured once per touch
+      let start = null;
 
       function draw() {
         frame = null;
         knob.style.setProperty('--a', state.a + 'deg');
-        sheet.style.setProperty('--hue', state.h);
-        modeBtns.forEach(m => m.classList.toggle('active', m.dataset.tmode === state.mode));
-        paintTheme(buildCustomTheme(state));                      // the whole app previews it live
+        wheel.style.setProperty('--hue', state.h);
+        const name = nameOf(state.h);
+        if (nameEl.textContent !== name) nameEl.textContent = name;
       }
       const paint = () => { if (!frame) frame = requestAnimationFrame(draw); };   // at most once per screen frame
 
+      // the whole app takes the colours (one style update, not one per frame)
+      function applyToApp() {
+        softColorChange();
+        sheet.style.setProperty('--hue', state.h);
+        modeBtns.forEach(m => m.classList.toggle('active', m.dataset.tmode === state.mode));
+        paintTheme(buildCustomTheme(state));
+      }
+
       // turn towards an angle the short way round (so a tap never spins the long way)
       function aim(e) {
-        const r = wheel.getBoundingClientRect();
-        const deg = (Math.atan2(e.clientX - (r.left + r.width / 2), -(e.clientY - (r.top + r.height / 2))) * 180 / Math.PI + 360) % 360;
+        const deg = (Math.atan2(e.clientX - (rect.left + rect.width / 2), -(e.clientY - (rect.top + rect.height / 2))) * 180 / Math.PI + 360) % 360;
         state.a += ((deg - state.a + 540) % 360) - 180;
         state.h = Math.round(((state.a % 360) + 360) % 360) % 360;
         paint();
       }
 
-      let start = null;
       wheel.addEventListener('pointerdown', (e) => {
-        const r = wheel.getBoundingClientRect();
-        const dist = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) / (r.width / 2);
+        rect = wheel.getBoundingClientRect();
+        const dist = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2)) / (rect.width / 2);
         if (dist < 0.5 || dist > 1.1) return;                    // only the ring
         start = { x: e.clientX, y: e.clientY };
         try { wheel.setPointerCapture(e.pointerId); } catch (_) {}
@@ -3989,21 +4055,28 @@
         sheet.classList.add('dragging');                         // dragging follows the finger with no delay
         aim(e);
       });
-      const release = () => { start = null; sheet.classList.remove('dragging'); };
+      const release = () => {
+        if (!start) return;
+        start = null;
+        sheet.classList.remove('dragging');
+        applyToApp();
+      };
       wheel.addEventListener('pointerup', release);
       wheel.addEventListener('pointercancel', release);
 
-      tint.addEventListener('input', () => { state.s = +tint.value; paint(); });
-      modeBtns.forEach(m => m.addEventListener('click', () => { state.mode = m.dataset.tmode; paint(); }));
+      tint.addEventListener('input', () => { state.s = +tint.value; });
+      tint.addEventListener('change', applyToApp);
+      modeBtns.forEach(m => m.addEventListener('click', () => { state.mode = m.dataset.tmode; applyToApp(); }));
 
       function open() {
         const saved = getSettings().customTheme;
         state = saved ? { a: saved.h, h: saved.h, s: Math.max(20, saved.s), mode: saved.mode } : { a: 190, h: 190, s: 60, mode: 'dark' };
         tint.value = state.s;
         isOpen = true;
+        draw();
+        applyToApp();
         backdrop.classList.add('show');
         sheet.classList.add('show');
-        draw();
       }
       function close(keep) {
         if (!isOpen) return;
@@ -4029,6 +4102,124 @@
 
       return { isOpen: () => isOpen, close };
     })();
+
+
+    // ===========================================================================
+    //  Small touches
+    // ===========================================================================
+
+    // While colours change, everything fades between the old and new ones for a moment (not all the time: that would be costly)
+    function softColorChange() {
+      const root = document.documentElement;
+      root.classList.add('color-fade');
+      clearTimeout(softColorChange.timer);
+      softColorChange.timer = setTimeout(() => root.classList.remove('color-fade'), 450);
+    }
+
+    // A thin line sweeps under the link box while a link is being read
+    function setFetching(on) {
+      const box = document.querySelector('.top-header .search-box');
+      if (box) box.classList.toggle('loading', on);
+    }
+
+
+    // ===========================================================================
+    //  Photo posts (Instagram photos, TikTok photo posts ...)
+    // ===========================================================================
+    let imagePost = null;                 // { images: [{url}], index, title, url } while a photo post is open on Home
+
+    // The dock turns into "Save photo": the first picture is shown, a carousel gets a small strip to look through
+    function setupImagePost(data) {
+      imagePost = { images: data.images, index: 0, title: data.title, url: urlInput.value.trim() };
+      isPlaylistMode = false;
+      playlistContainer.classList.remove('visible');
+      centerPreview.classList.remove('vertical-video');
+      centerPreview.classList.add('image-preview');
+      centerPreview.style.display = 'block';
+      centerThumb.src = data.images[0].url;
+      centerPlayBtn.style.display = 'none';
+      const n = data.images.length;
+      duration.textContent = n > 1 ? n + ' photos' : 'Photo';
+      downloadDock.classList.add('image-mode');
+      document.querySelector('#btnSaveImage span').textContent = hasNativeApi() ? (n > 1 ? `Save all (${n})` : 'Save photo') : 'Open photo';
+
+      resSelector.innerHTML = '';
+      if (n > 1) {
+        data.images.forEach((im, i) => {
+          const b = document.createElement('button');
+          b.className = 'chip photo-chip' + (i === 0 ? ' active' : '');
+          b.innerHTML = `<img src="${escHtml(im.url)}" alt="Photo ${i + 1}">`;
+          b.addEventListener('click', () => {
+            imagePost.index = i;
+            centerThumb.src = im.url;
+            resSelector.querySelectorAll('.photo-chip').forEach((c, k) => c.classList.toggle('active', k === i));
+          });
+          resSelector.appendChild(b);
+        });
+      }
+    }
+
+    // Saves the pictures one after another into the phone's Pictures folder. Returns the names and addresses that worked.
+    async function saveImagesToPhone(images, title) {
+      const names = [], uris = [];
+      let failed = 0, lastErr = '';
+      const card = addDlProgress(title || 'Photo', { noCancel: true });          // shows at once
+      try {
+        for (let i = 0; i < images.length; i++) {
+          const res = await api('/api/image', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: images[i].url, filename: title || 'photo', index: images.length > 1 ? i : -1 })
+          });
+          if (!res.ok) { failed++; lastErr = (await res.json().catch(() => ({}))).error || 'Could not save the photo.'; }
+          else {
+            const saved = await res.json();
+            names.push(saved.name);
+            uris.push(saved.uri || null);
+          }
+          if (card) card.update(((i + 1) / images.length) * 100);
+        }
+      } finally {
+        if (card) card.remove(900);
+      }
+      return { names, uris, failed, lastErr };
+    }
+
+    document.getElementById('btnSaveImage').addEventListener('click', async () => {
+      if (!imagePost) return;
+      if (!hasNativeApi()) { window.open(imagePost.images[imagePost.index].url, '_blank', 'noopener'); return; }   // browser: just open it
+      const r = await saveImagesToPhone(imagePost.images, imagePost.title);
+      if (!r.names.length) return showToast(r.lastErr || 'Could not save the photo.', 'error');
+      haptic('confirm');
+      addHistoryEntry({
+        url: imagePost.url, title: imagePost.title, thumbnail: imagePost.images[0].url,
+        platform: detectPlatform(imagePost.url), type: 'image', resolution: '',
+        fileUri: r.uris[0], fileMime: mimeOf(r.names[0])
+      });
+      reportDownloads(r.names, r.failed, r.uris);
+    });
+
+    // Same thing for a saved link or a Recent item (no screen needed): read the post, save its photos
+    async function quickImage(item, opts = {}) {
+      try {
+        const res = await api('/api/info', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: item.url })
+        });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Could not read this link.');
+        const data = await res.json();
+        if (!data.isImagePost) throw new Error('This link has no photos.');
+        const r = await saveImagesToPhone(data.images, item.title || data.title);
+        if (!r.names.length) throw new Error(r.lastErr || 'Could not save the photos.');
+        addHistoryEntry({
+          url: item.url, title: item.title || data.title, thumbnail: item.thumbnail || data.thumbnail,
+          platform: item.platform, type: 'image', resolution: '', fileUri: r.uris[0], fileMime: mimeOf(r.names[0])
+        });
+        if (opts.toast !== false) { haptic('confirm'); reportDownloads(r.names, r.failed, r.uris); }
+        return { ok: true, name: r.names[0], uri: r.uris[0] };
+      } catch (err) {
+        if (opts.toast !== false) showToast(err.message || 'Failed to save the photos.', 'error');
+        return { ok: false, error: err };
+      }
+    }
 
     // ---------- Back button (called by the app): close the top-most thing first, exit only from Home ----------
     window.__handleBack = function () {

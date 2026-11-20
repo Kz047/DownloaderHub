@@ -133,7 +133,7 @@ private fun isPrivateAddress(a: InetAddress): Boolean {
 }
 
 // Downloads one small image safely. Throws an IOException if anything looks wrong.
-private fun fetchImage(target: String, depth: Int = 0): Pair<ByteArray, String> {
+private fun fetchImage(target: String, depth: Int = 0, maxBytes: Int = MAX_THUMB_BYTES): Pair<ByteArray, String> {
     if (depth > 3) throw IOException("Too many redirects")
     val u = java.net.URL(target)
     if (u.protocol != "http" && u.protocol != "https") throw IOException("Bad URL")
@@ -152,7 +152,7 @@ private fun fetchImage(target: String, depth: Int = 0): Pair<ByteArray, String> 
         val code = conn.responseCode
         if (code == 301 || code == 302 || code == 303 || code == 307 || code == 308) {
             val loc = conn.getHeaderField("Location") ?: throw IOException("Bad redirect")
-            return fetchImage(java.net.URL(u, loc).toString(), depth + 1)
+            return fetchImage(java.net.URL(u, loc).toString(), depth + 1, maxBytes)
         }
 
         val type = (conn.contentType ?: "").substringBefore(';').trim().lowercase()
@@ -167,7 +167,7 @@ private fun fetchImage(target: String, depth: Int = 0): Pair<ByteArray, String> 
                 val n = input.read(buf)
                 if (n < 0) break
                 out.write(buf, 0, n)
-                if (out.size() > MAX_THUMB_BYTES) throw IOException("Image too large")
+                if (out.size() > maxBytes) throw IOException("Image too large")
             }
         }
         return out.toByteArray() to type
@@ -410,6 +410,7 @@ class MainActivity : AppCompatActivity() {
         onProgress: ((Float) -> Unit)? = null
     ): YoutubeDLResponse {
         request.addOption("--cache-dir", ytCacheDir().absolutePath)
+        request.addOption("--socket-timeout", "25")      // a stalled connection fails instead of hanging this thread (and mediaLock) forever
         fun once(): YoutubeDLResponse =
             if (processId != null) {
                 YoutubeDL.getInstance().execute(request, processId) { p, _, _ -> onProgress?.invoke(p) }
@@ -448,10 +449,18 @@ class MainActivity : AppCompatActivity() {
     // Updates yt-dlp at most once a day, on its own thread, so the first link or song is not held up for it
     private fun updateInBackground() {
         val prefs = getSharedPreferences("dh", MODE_PRIVATE)
+        val now = System.currentTimeMillis()
         val last = prefs.getLong("ytdlp_updated", 0L)
-        if (System.currentTimeMillis() - last <= 24L * 60 * 60 * 1000) return
-        thread(name = "ytdlp-update") {
+        val lastTry = prefs.getLong("ytdlp_update_try", 0L)
+        if (now - last <= 24L * 60 * 60 * 1000) return
+        if (now - lastTry <= 60L * 60 * 1000) return          // failed recently (offline?): try again in an hour, not on every request
+        if (DownloadTracker.count() > 0) return               // never swap yt-dlp's files under a running download
+        synchronized(initLock) {
+            if (updating) return                              // another update thread is already running
             updating = true
+        }
+        prefs.edit().putLong("ytdlp_update_try", now).apply()
+        thread(name = "ytdlp-update") {
             try {
                 val status = YoutubeDL.getInstance().updateYoutubeDL(application, YoutubeDL.UpdateChannel.STABLE)
                 Log.d("DLHUB", "yt-dlp update: $status")
@@ -481,8 +490,66 @@ class MainActivity : AppCompatActivity() {
             "/api/check" -> apiCheck(body)
             "/api/thumb" -> apiThumb(path)
             "/api/music/search" -> apiMusicSearch(body)
+            "/api/image" -> apiImage(body)
             else -> 501 to errJson("This feature is not in the app yet.")
         }
+    }
+
+    // The biggest picture yt-dlp lists for a post (it lists the largest last)
+    private fun bestImage(info: JSONObject): JSONObject? {
+        val list = info.optJSONArray("thumbnails")
+        var best: JSONObject? = null
+        var bestArea = -1L
+        if (list != null) {
+            for (i in 0 until list.length()) {
+                val t = list.optJSONObject(i) ?: continue
+                val u = t.str("url") ?: continue
+                if (!u.startsWith("https://")) continue
+                val area = t.optLong("width", 0) * t.optLong("height", 0)
+                if (best == null || area >= bestArea) { best = t; bestArea = area }
+            }
+        }
+        if (best != null) return best
+        val single = info.str("thumbnail")
+        return if (single != null && single.startsWith("https://")) JSONObject().put("url", single) else null
+    }
+
+    private fun hasVideo(e: JSONObject): Boolean {
+        val f = e.optJSONArray("formats")
+        if (f != null && f.length() > 0) return true
+        return e.optDouble("duration", 0.0) > 0.0
+    }
+
+    // Describes a photo-only post for the page, or null when it is a normal video / playlist
+    private fun imagePostFrom(d: JSONObject): JSONObject? {
+        val images = JSONArray()
+        fun add(info: JSONObject) {
+            val t = bestImage(info) ?: return
+            images.put(
+                JSONObject().put("url", t.str("url")).put("width", t.optInt("width", 0)).put("height", t.optInt("height", 0))
+            )
+        }
+        val entries = d.optJSONArray("entries")
+        if (entries != null) {
+            if (entries.length() == 0) return null
+            for (i in 0 until entries.length()) {
+                val e = entries.optJSONObject(i) ?: return null
+                if (e.str("_type") == "url" || hasVideo(e)) return null      // a normal playlist, or a carousel with videos
+                add(e)
+            }
+        } else {
+            if (hasVideo(d)) return null
+            add(d)
+        }
+        if (images.length() == 0) return null
+        return JSONObject()
+            .put("isPlaylist", false)
+            .put("isImagePost", true)
+            .put("title", d.str("title") ?: "Photo")
+            .put("artist", d.str("uploader") ?: d.str("channel") ?: JSONObject.NULL)
+            .put("thumbnail", images.getJSONObject(0).getString("url"))
+            .put("images", images)
+            .put("formats", JSONArray())
     }
 
     private fun apiInfo(body: JSONObject): Pair<Int, JSONObject> {
@@ -497,6 +564,8 @@ class MainActivity : AppCompatActivity() {
         request.addOption("--flat-playlist")
         request.addOption("--no-warnings")
         if (isYouTube(url)) request.addOption("--extractor-args", "youtube:skip=hls,dash")
+        // A post with only photos has no video: with this, yt-dlp still tells us about it (and lists its pictures)
+        else request.addOption("--ignore-no-formats-error")
 
         val stdout = try {
             ytRun(request).out
@@ -510,6 +579,9 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             return 500 to errJson("Failed to parse media details.")
         }
+
+        // ---- A post that is only photos (Instagram photo posts, TikTok photo posts ...) ----
+        if (!isYouTube(url)) imagePostFrom(d)?.let { return 200 to it }
 
         // ---- Playlist ----
         val entriesArr = d.optJSONArray("entries")
@@ -683,6 +755,8 @@ class MainActivity : AppCompatActivity() {
 
     // ---- Download: yt-dlp works in a private cache folder, then the file is copied to Downloads ----
     private val downloadSlots = Semaphore(2)   // at most 2 downloads at the same time
+    // Calls whose cancel button was pressed before they got a download slot (they have no yt-dlp process yet)
+    private val cancelledCalls = ConcurrentHashMap.newKeySet<Int>()
 
     // Copies into the folder chosen in Settings. Returns null when none is chosen or it no longer works.
     private fun saveToChosenFolder(file: File, displayName: String, mime: String): Pair<String, String?>? {
@@ -704,14 +778,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     // One attempt to save through MediaStore into the given Downloads sub-folder (Android 10+)
-    private fun saveViaMediaStore(file: File, displayName: String, mime: String, folder: String): Pair<String, String?> {
+    private fun saveViaMediaStore(
+        file: File, displayName: String, mime: String, folder: String,
+        collection: Uri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
+    ): Pair<String, String?> {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
             put(MediaStore.MediaColumns.MIME_TYPE, mime)
             put(MediaStore.MediaColumns.RELATIVE_PATH, folder)
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
-        val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+        val uri = contentResolver.insert(collection, values)
             ?: throw IOException("Could not create the file in $folder")
         try {
             val out = contentResolver.openOutputStream(uri)
@@ -725,6 +802,54 @@ class MainActivity : AppCompatActivity() {
             throw e
         }
         return displayName to uri.toString()
+    }
+
+    // Photos go to Pictures/DownloaderHub so they show up in the Gallery (or the folder chosen in Settings)
+    private fun saveImage(bytes: ByteArray, displayName: String, mime: String): Pair<String, String?> {
+        val tmp = File(workRoot(), "img-${System.nanoTime()}.tmp")
+        try {
+            tmp.writeBytes(bytes)
+            saveToChosenFolder(tmp, displayName, mime)?.let { return it }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return try {
+                    saveViaMediaStore(tmp, displayName, mime, Environment.DIRECTORY_PICTURES + "/DownloaderHub", MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                } catch (first: Exception) {
+                    Log.e("DLHUB", "Pictures failed, trying Downloads", first)
+                    saveViaMediaStore(tmp, displayName, mime, Environment.DIRECTORY_DOWNLOADS + "/DownloaderHub")
+                }
+            }
+            @Suppress("DEPRECATION")
+            val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DownloaderHub")
+            if (!dir.exists() && !dir.mkdirs()) throw IOException("Could not create the Pictures/DownloaderHub folder")
+            val target = File(dir, displayName)
+            tmp.copyTo(target, overwrite = true)
+            return target.name to null
+        } finally {
+            tmp.delete()
+        }
+    }
+
+    // ---- Save one photo: the page sends the picture's link (found by /api/info) ----
+    private fun apiImage(body: JSONObject): Pair<Int, JSONObject> {
+        val raw = body.str("url") ?: return 400 to errJson("Photo link is required")
+        val imgUrl = cleanUrl(raw)?.takeIf { it.startsWith("https://") } ?: return 400 to errJson("That is not a safe photo link.")
+        val index = body.optInt("index", -1)
+        val base = sanitizeFilename(body.str("filename") ?: "photo").ifEmpty { "photo" }.take(80)
+
+        val freeMb = freeBytes(workRoot()) / (1024 * 1024)
+        if (freeMb < 30) return 507 to errJson("Only about $freeMb MB of space is free on the phone. Free some space and try again.")
+
+        return try {
+            val (bytes, mime) = fetchImage(imgUrl, 0, 25 * 1024 * 1024)
+            val ext = when (mime) { "image/jpeg" -> "jpg"; "image/png" -> "png"; "image/webp" -> "webp"; "image/gif" -> "gif"; else -> "avif" }
+            val name = if (index >= 0) "$base-${index + 1}.$ext" else "$base.$ext"
+            val (saved, uri) = saveImage(bytes, name, mime)
+            Log.d("DLHUB", "photo saved: $saved (${bytes.size / 1024} KB)")
+            200 to JSONObject().put("saved", true).put("name", saved).put("uri", uri ?: JSONObject.NULL).put("mime", mime)
+        } catch (e: Exception) {
+            Log.e("DLHUB", "photo download failed", e)
+            502 to errJson("Could not save the photo: ${(e.message ?: "unknown reason").take(100)}")
+        }
     }
 
     // Returns the saved name and, when possible, the file's address (used by Open / Share in the app)
@@ -785,7 +910,14 @@ class MainActivity : AppCompatActivity() {
             return 507 to errJson("Only about $freeMb MB of space is free on the phone. Free some space and try again.")
         }
         sweepOldWork()
-        downloadSlots.acquire()
+        // Wait for a slot, but keep listening for Cancel (a queued download has no process to kill yet)
+        while (!downloadSlots.tryAcquire(300, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+            if (callId >= 0 && cancelledCalls.remove(callId)) return 499 to errJson("Download cancelled")
+        }
+        if (callId >= 0 && cancelledCalls.remove(callId)) {
+            downloadSlots.release()
+            return 499 to errJson("Download cancelled")
+        }
         val workDir = File(root, "dl-${System.nanoTime()}")
         try {
             DownloadTracker.begin(applicationContext, processId)
@@ -803,7 +935,7 @@ class MainActivity : AppCompatActivity() {
                 request.addOption("--audio-quality", audioQuality)
                 request.addOption("--embed-metadata")
             } else if (height != null) {
-                request.addOption("-f", "bv*[height<=$height]+ba/b[height<=$height]")
+                request.addOption("-f", "bv*[height<=$height]+ba/b[height<=$height]/bv*+ba/b")
                 request.addOption("-S", "res:$height,ext:mp4:m4a")
                 request.addOption("--merge-output-format", "mp4")
             } else if (fid.isNotEmpty()) {
@@ -1244,6 +1376,38 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Share several saved files at once (the "Download Complete" popup after a batch)
+        @JavascriptInterface
+        fun shareFiles(urisJson: String, mime: String): String {
+            return try {
+                val arr = org.json.JSONArray(urisJson)
+                val uris = ArrayList<Uri>()
+                for (i in 0 until arr.length()) {
+                    val u = Uri.parse(arr.getString(i))
+                    try {
+                        contentResolver.openFileDescriptor(u, "r")?.close()
+                        uris.add(u)
+                    } catch (e: Exception) { /* that file is gone: skip it */ }
+                }
+                if (uris.isEmpty()) return "missing"
+                val send = Intent(Intent.ACTION_SEND_MULTIPLE)
+                    .setType(mime)
+                    .putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                val clip = ClipData.newRawUri("", uris[0])
+                uris.drop(1).forEach { clip.addItem(ClipData.Item(it)) }
+                send.clipData = clip
+                startActivity(
+                    Intent.createChooser(send, "Share")
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+                "ok"
+            } catch (e: Exception) {
+                Log.e("DLHUB", "share files failed", e)
+                "missing"
+            }
+        }
+
         // ---- Copy / share a link (the browser clipboard is blocked in the WebView) ----
         @JavascriptInterface
         fun copyText(text: String) {
@@ -1279,7 +1443,8 @@ class MainActivity : AppCompatActivity() {
         // ---- Cancel one download from the page (its progress card has a cancel button) ----
         @JavascriptInterface
         fun cancelDownloadCall(callId: Int) {
-            callToProcess[callId]?.let { DownloadTracker.cancelOne(it) }
+            val pid = callToProcess[callId]
+            if (pid != null) DownloadTracker.cancelOne(pid) else cancelledCalls.add(callId)
         }
 
         // ---- Haptic feedback (the page only calls this when the setting is on) ----
@@ -1435,6 +1600,12 @@ class MainActivity : AppCompatActivity() {
         controllerFuture?.let { MediaController.releaseFuture(it) }
         controllerFuture = null
         controller = null
+        try {
+            (web.parent as? ViewGroup)?.removeView(web)
+            web.destroy()
+        } catch (e: Exception) {
+            Log.e("DLHUB", "web view cleanup failed", e)
+        }
         super.onDestroy()
     }
 
@@ -1449,6 +1620,21 @@ class MainActivity : AppCompatActivity() {
         web.settings.textZoom = 100
         web.settings.mediaPlaybackRequiresUserGesture = false
         web.webViewClient = object : WebViewClient() {
+            // Only the app's own page may live in this WebView. Any other link opens in the browser,
+            // so no outside site can ever reach window.AndroidBridge.
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val u = request.url
+                if (u.scheme == "file" && u.path?.startsWith("/android_asset/") == true) return false
+                if (u.scheme == "http" || u.scheme == "https") {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, u).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    } catch (e: ActivityNotFoundException) {
+                        say("No app can open this link")
+                    }
+                }
+                return true
+            }
+
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                 if (request.url.host != MEDIA_HOST) return super.shouldInterceptRequest(view, request)
                 return try {

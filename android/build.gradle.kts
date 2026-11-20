@@ -14,12 +14,12 @@ android {
         applicationId = "com.kyz.downloaderhub"
         minSdk = 24
         targetSdk = 36
-        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk { abiFilters += listOf("arm64-v8a") }
-        versionCode = 5// ADD
+        versionCode = 7
+        versionName = "1.2.0"// ADD
     }
 
     buildTypes {

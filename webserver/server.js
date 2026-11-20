@@ -22,6 +22,36 @@ function isLoopback(addr) {
   return a === '::1' || a.startsWith('127.') || a.startsWith('::ffff:127.');
 }
 
+const EXTRA_ORIGINS = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const LOCAL_ORIGIN = /^(https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?|https:\/\/appassets\.androidplatform\.net|capacitor:\/\/localhost|null)$/;
+
+// ---------------------------------------------------------------------------
+// Host / Origin guard. Without it, any web page you visit could talk to this server:
+//  - a plain <form> POST from another site is sent even though CORS hides the answer
+//    (it could switch "Start sharing" on), and
+//  - DNS rebinding lets a hostile site point its own name at 127.0.0.1 and read the API.
+// Allowed Host values: localhost, IP addresses, *.local, plus ALLOWED_HOSTS="name1,name2".
+// ---------------------------------------------------------------------------
+const EXTRA_HOSTS = (process.env.ALLOWED_HOSTS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+function hostAllowed(hostHeader) {
+  const h = String(hostHeader || '').toLowerCase().replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
+  return h === 'localhost' || net.isIP(h) !== 0 || h.endsWith('.local') || EXTRA_HOSTS.includes(h);
+}
+app.use((req, res, next) => {
+  if (!hostAllowed(req.headers.host)) {
+    return res.status(403).type('text/plain').send('Unknown host name. Open DownloaderHub through localhost or its IP address.');
+  }
+  const origin = req.headers.origin;
+  if (origin && req.method !== 'GET' && req.method !== 'HEAD') {
+    let sameHost = false;
+    try { sameHost = new URL(origin).host.toLowerCase() === String(req.headers.host).toLowerCase(); } catch (_) {}
+    if (!sameHost && !(origin !== 'null' && LOCAL_ORIGIN.test(origin)) && !EXTRA_ORIGINS.includes(origin)) {   // "null" origins (sandboxed frames, odd redirects) are not trusted for writes
+      return res.status(403).json({ error: 'Cross-site request blocked.' });
+    }
+  }
+  next();
+});
+
 // First thing every request meets: is it from this computer, or from another device?
 app.use((req, res, next) => {
   req.isRemote = !isLoopback(req.socket.remoteAddress);
@@ -50,13 +80,10 @@ const MAX_JOBS = Math.max(1, parseInt(process.env.MAX_JOBS, 10) || 3);
 // CORS: only this device's own pages (browser on localhost, Android WebView).
 // Add more origins with CORS_ORIGINS="https://a.example,https://b.example".
 // ---------------------------------------------------------------------------
-const EXTRA_ORIGINS = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-const LOCAL_ORIGIN = /^(https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?|https:\/\/appassets\.androidplatform\.net|capacitor:\/\/localhost|null)$/;
 app.use(cors({
   origin: (origin, cb) => cb(null, !origin || LOCAL_ORIGIN.test(origin) || EXTRA_ORIGINS.includes(origin))
 }));
 app.use(express.json({ limit: '100kb' }));
-app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
 // Only the app's own files are public. (Serving __dirname would expose server.js and more.)
 const STATIC_FILES = {
@@ -95,7 +122,7 @@ app.get('/api/share', (req, res) => res.json(shareState(req)));
 
 app.post('/api/share', (req, res) => {
   if (req.isRemote) return res.status(403).json({ error: 'Only the computer running the server can change sharing.' });
-  sharingEnabled = !!(req.body && req.body.enabled);
+  sharingEnabled = !!(req.body && req.body.enabled === true);   // strict: the string "false" must not switch it on
   console.log(`[share] sharing is now ${sharingEnabled ? 'ON' : 'OFF'}`);
   res.json(shareState(req));
 });
@@ -132,6 +159,43 @@ async function remoteUrlBlocked(req, url) {
   } catch (_) { return true; }   // can't tell: refuse
 }
 const REMOTE_BLOCKED_MSG = { error: 'That address is not allowed from another device.' };
+
+const isYouTube = (u) => /^https?:\/\/([\w-]+\.)?(youtube\.com|youtu\.be)\//i.test(u);
+
+// Biggest https picture yt-dlp lists for a post
+function bestImage(info) {
+  let best = null, bestArea = -1;
+  for (const t of (info.thumbnails || [])) {
+    if (!t || typeof t.url !== 'string' || !t.url.startsWith('https://')) continue;
+    const area = (t.width || 0) * (t.height || 0);
+    if (!best || area >= bestArea) { best = t; bestArea = area; }
+  }
+  if (best) return best;
+  return (typeof info.thumbnail === 'string' && info.thumbnail.startsWith('https://')) ? { url: info.thumbnail } : null;
+}
+const hasVideo = (e) => (Array.isArray(e.formats) && e.formats.length > 0) || (e.duration || 0) > 0;
+
+// Describes a photo-only post (Instagram / TikTok photos...) or returns null for a normal video / playlist
+function imagePostFrom(d) {
+  const images = [];
+  const add = (info) => { const t = bestImage(info); if (t) images.push({ url: t.url, width: t.width || 0, height: t.height || 0 }); };
+  if (Array.isArray(d.entries)) {
+    if (!d.entries.length) return null;
+    for (const e of d.entries) {
+      if (!e || e._type === 'url' || hasVideo(e)) return null;
+      add(e);
+    }
+  } else {
+    if (hasVideo(d)) return null;
+    add(d);
+  }
+  if (!images.length) return null;
+  return {
+    isPlaylist: false, isImagePost: true,
+    title: d.title || 'Photo', artist: d.uploader || d.channel || null,
+    thumbnail: images[0].url, images, formats: []
+  };
+}
 
 function lastLine(s) {
   return String(s || '').split('\n').filter(l => l.trim()).pop() || '';
@@ -355,13 +419,17 @@ app.post('/api/info', async (req, res) => {
 
   let stdout;
   try {
-    stdout = await ytExec(['--dump-single-json', '--no-download', '--flat-playlist', '--', url], { timeout: 45000 });
+    // For non-YouTube links, --ignore-no-formats-error lets yt-dlp describe photo-only posts instead of failing
+    stdout = await ytExec(['--dump-single-json', '--no-download', '--flat-playlist',
+      ...(isYouTube(url) ? [] : ['--ignore-no-formats-error']), '--', url], { timeout: 45000 });
   } catch (err) {
     return res.status(400).json({ error: err.message, reason: classifyYtError(err.message) });
   }
 
   try {
     const d = JSON.parse(stdout);
+
+    if (!isYouTube(url)) { const post = imagePostFrom(d); if (post) return res.json(post); }
 
     if (d._type === 'playlist' || d.entries) {
       const entries = (d.entries || [])
@@ -595,11 +663,13 @@ app.post('/api/download', async (req, res) => {
 
   let args;
   if (type === 'audio') {
-    args = ['-x', '--audio-format', 'mp3', '--audio-quality', '0', '--embed-metadata', '--embed-thumbnail', '-o', tmpFile];
+    // Settings > Audio Quality: best (0), standard (~128 kbps = 5), small (~96 kbps = 7)
+    const aq = { standard: '5', small: '7' }[body.audioQuality] || '0';
+    args = ['-x', '--audio-format', 'mp3', '--audio-quality', aq, '--embed-metadata', '--embed-thumbnail', '-o', tmpFile];
   } else if (heightMatch) {
     const height = parseInt(heightMatch[1], 10);
     args = [
-      '-f', `bv*[height<=${height}]+ba/b[height<=${height}]`,
+      '-f', `bv*[height<=${height}]+ba/b[height<=${height}]/bv*+ba/b`,
       '-S', `res:${height},ext:mp4:m4a`,
       '--merge-output-format', 'mp4',
       '-o', tmpFile
@@ -733,6 +803,13 @@ app.get('/api/stream', async (req, res) => {
     if (!res.headersSent) res.status(500).json({ error: err.message });
   }
 });
+
+app.post('/api/image', (req, res) => {
+  res.status(501).json({ error: 'Saving photos to the gallery only works in the Android app. Use the open-in-browser button here.' });
+});
+
+// Any other unknown /api route answers JSON too (the page always expects JSON)
+app.use('/api', (req, res) => res.status(404).json({ error: 'Unknown API route.' }));
 
 app.listen(PORT, HOST, () => {
   console.log(`Server running at http://localhost:${PORT}`);

@@ -1945,17 +1945,17 @@ button:active:not(:disabled), .chip:active, .filter-chip:active, .theme-pill:act
 }
 @media (min-width: 769px) { .dl-stack { left: auto; right: 24px; width: 340px; } }
 .dl-prog {
-  pointer-events: auto; padding: 10px 12px 12px; border-radius: 14px;
+  pointer-events: auto; padding: 7px 10px 9px; border-radius: 12px;
   background: var(--bg-elevated); border: 1px solid var(--border); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   animation: dl-in 0.28s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .dl-prog:nth-child(n+4) { display: none; }
 .dl-prog.out { opacity: 0; transform: translate3d(0, -8px, 0); transition: opacity 0.2s ease, transform 0.2s ease; }
 .dl-prog-top { display: flex; align-items: center; gap: 10px; }
-.dl-prog-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dl-prog-pct { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.dl-prog-cancel { width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--bg-surface); color: var(--text-muted); font-size: 12px; }
-.dl-prog-bar { height: 4px; margin-top: 8px; border-radius: 2px; overflow: hidden; background: color-mix(in srgb, var(--text-main) 12%, transparent); }
+.dl-prog-title { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dl-prog-pct { font-size: 11.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.dl-prog-cancel { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--bg-surface); color: var(--text-muted); font-size: 11px; }
+.dl-prog-bar { height: 3px; margin-top: 6px; border-radius: 2px; overflow: hidden; background: color-mix(in srgb, var(--text-main) 12%, transparent); }
 .dl-prog-fill { width: 100%; height: 100%; background: var(--accent); transform-origin: left center; transform: scaleX(0); transition: transform 0.35s linear; }
 .dl-prog.indeterminate .dl-prog-fill { width: 40%; transform: none; transition: none; animation: dl-slide 1.1s ease-in-out infinite; }
 @keyframes dl-in { from { opacity: 0; transform: translate3d(0, -12px, 0); } to { opacity: 1; transform: none; } }
@@ -2158,11 +2158,11 @@ body.nav-bottom .collections-view.in-collection #collectionsTitle { display: blo
 /* ---------- downloads: tuck the cards into one chip ---------- */
 .dl-pill {
   display: none; align-self: flex-end; align-items: center; gap: 8px; pointer-events: auto;
-  padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border);
-  background: var(--bg-elevated); color: var(--text-main); font-size: 13px; font-weight: 700;
+  padding: 6px 11px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg-elevated); color: var(--text-main); font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
-.dl-pill svg { width: 16px; height: 16px; color: var(--accent); }
+.dl-pill svg { width: 14px; height: 14px; color: var(--accent); }
 .dl-stack.min:not(.empty) .dl-pill { display: inline-flex; animation: dl-in 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
 .dl-stack.min .dl-prog { display: none; }
 /* the chip is the first child, so allow three cards again */
@@ -2268,8 +2268,12 @@ body.nav-bottom .collections-view.in-collection #collectionsTitle { display: blo
 }
 .wheel-orb {
   position: absolute; left: 50%; top: 50%; width: 88px; height: 88px; margin: -44px 0 0 -44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
   background: hsl(var(--hue, 190) 85% 55%); box-shadow: 0 0 36px hsl(var(--hue, 190) 85% 55% / 0.45);
+  transition: box-shadow 0.25s ease;
 }
+.wheel-orb span { font-size: 14px; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45); }
+.te-sheet.dragging .wheel-orb { box-shadow: none; }          /* a big glow is costly to redraw, so it rests while you drag */
 .wheel-knob {
   --a: 0deg;
   position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; border-radius: 50%; scale: 1;
@@ -2330,3 +2334,111 @@ body.nav-bottom .collections-view.in-collection #collectionsTitle { display: blo
 .view-enter #musicGrid > :nth-child(6), .view-enter .settings-pane > .setting-block:nth-child(6) { animation-delay: 175ms; }
 .view-enter #historyList > :nth-child(n+7), .view-enter #collectionsGrid > :nth-child(n+7), .view-enter #collectionsList > :nth-child(n+7),
 .view-enter #musicGrid > :nth-child(n+7), .view-enter .settings-pane > .setting-block:nth-child(n+7) { animation-delay: 210ms; }
+
+/* the short "Download Complete" popup */
+.done-file { margin: 4px 0 18px; font-size: 14px; line-height: 1.4; color: var(--text-muted); text-align: center; word-break: break-word;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+
+/* =========================================================
+   PART 16 - small touches that make the app feel alive
+   (movement and fading only, so they stay smooth; all of them stop with "Reduce Motion")
+   ========================================================= */
+
+@keyframes eq { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes tab-pop { 0% { scale: 0.7; } 60% { scale: 1.2; } 100% { scale: 1; } }
+@keyframes select-pop { 0% { scale: 0.94; } 60% { scale: 1.05; } 100% { scale: 1; } }
+@keyframes heart-pop { 0% { transform: scale(1); } 35% { transform: scale(1.55); } 70% { transform: scale(0.92); } 100% { transform: scale(1.18); } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes ring-out { from { opacity: 0.5; transform: scale(0.6); } to { opacity: 0; transform: scale(1.5); } }
+@keyframes float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -6px, 0); } }
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* a little equaliser shows which song is playing (only drawn while it plays) */
+.eq { display: none; align-items: flex-end; gap: 2px; height: 14px; }
+.eq i { width: 3px; height: 100%; border-radius: 2px; background: var(--accent); transform-origin: bottom; transform: scaleY(0.3); animation: eq 0.9s ease-in-out infinite; }
+.eq i:nth-child(2) { animation-delay: 0.15s; }
+.eq i:nth-child(3) { animation-delay: 0.3s; }
+.track-art-container { position: relative; }
+.track-card .eq { position: absolute; left: 8px; bottom: 8px; z-index: 2; height: 24px; padding: 5px 6px; border-radius: 8px; background: rgba(0, 0, 0, 0.55); }
+.track-card.playing .eq { display: flex; }
+.mini-player.is-playing .mini-eq { display: flex; }
+
+/* tabs and selections give a little bounce when chosen */
+.bn-item.active svg { animation: tab-pop 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+.theme-pill.active, .chip.active { animation: select-pop 0.28s cubic-bezier(0.25, 1, 0.5, 1); }
+.track-action.like-btn.pop svg { animation: heart-pop 0.45s cubic-bezier(0.25, 1, 0.5, 1); }
+
+/* the Download Complete popup: the tick draws itself and a ring spreads out */
+.done-icon { position: relative; animation: pop-in 0.35s cubic-bezier(0.25, 1, 0.5, 1); }
+.done-icon polyline { stroke-dasharray: 26; stroke-dashoffset: 26; animation: draw 0.4s 0.18s ease-out forwards; }
+.done-icon::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid currentColor; animation: ring-out 0.7s 0.1s ease-out both; }
+
+/* Home welcome: the icon floats, the platform chips arrive one after another */
+.hero-icon { animation: float 4s ease-in-out infinite; }
+.empty-preview-grid > * { animation: rise 0.4s cubic-bezier(0.25, 1, 0.5, 1) both; }
+.empty-preview-grid > :nth-child(1) { animation-delay: 0.1s; }
+.empty-preview-grid > :nth-child(2) { animation-delay: 0.16s; }
+.empty-preview-grid > :nth-child(3) { animation-delay: 0.22s; }
+.empty-preview-grid > :nth-child(4) { animation-delay: 0.28s; }
+.empty-preview-grid > :nth-child(5) { animation-delay: 0.34s; }
+
+/* the open music player: the cover breathes while a song plays */
+.audio-player-bar.is-playing #audioPlayerArt { animation: breathe 4s ease-in-out infinite; }
+
+/* download cards: a light sweeps along the bar, green and a tick when done */
+.dl-prog-fill { position: relative; overflow: hidden; }
+.dl-prog:not(.indeterminate):not(.done) .dl-prog-fill::after {
+  content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: shine 1.4s linear infinite;
+}
+.dl-prog.done .dl-prog-fill { background: #22c55e; }
+.dl-prog.done .dl-prog-pct { color: #22c55e; font-weight: 800; }
+
+/* a thin line sweeps under the link box while a link is being read */
+.top-header .search-box { position: relative; overflow: hidden; }
+.top-header .search-box.loading::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: sweep 1s ease-in-out infinite;
+}
+
+/* colours fade between old and new for a moment after you change a theme or accent */
+.color-fade *, .color-fade *::before, .color-fade *::after {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, fill 0.35s ease, stroke 0.35s ease !important;
+}
+.color-fade .te-sheet { transition: transform 0.34s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.35s ease !important; }
+.color-fade .te-backdrop { transition: opacity 0.25s ease !important; }
+
+
+/* =========================================================
+   PART 17 - photo posts
+   ========================================================= */
+#btnSaveImage { display: none; }
+.download-dock.image-mode #btnSaveImage { display: inline-flex; }
+.download-dock.image-mode #btnVideo,
+.download-dock.image-mode #btnAudio { display: none; }
+
+/* the picture keeps its own shape instead of being cut to a 16:9 box */
+#centerPreview.image-preview { aspect-ratio: auto !important; height: auto !important; max-height: none !important; width: 100% !important; }
+#centerPreview.image-preview .center-thumb { height: auto; max-height: calc(100vh - 430px); object-fit: contain; border-radius: inherit; background: #000; }
+
+/* carousel strip: small square pictures instead of resolution buttons */
+.photo-chip { width: 46px; height: 46px; padding: 0 !important; flex: 0 0 auto !important; overflow: hidden; border-radius: 10px; }
+.photo-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-chip.active { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* ---- Fixes: preview controls overflow + clipped photo chip ---- */
+/* Video preview controls: the bottom row may shrink, so the fullscreen button and volume never get pushed out of a narrow video */
+.player-bottom-row { gap: 8px; min-width: 0; }
+.player-controls { padding-left: 12px; padding-right: 12px; }
+.player-volume-row { min-width: 0; flex: 0 1 auto; }
+.player-volume { width: clamp(36px, 16vw, 70px); min-width: 0; }
+/* Phones use the hardware volume keys: no slider on touch screens (this also frees room for fullscreen) */
+@media (hover: none) { .player-volume { display: none; } }
+
+/* Photo thumbnails: the scrolling row cut off the left edge of the selected one's outline */
+.res-chips:has(.photo-chip) { padding: 4px 4px 6px; box-sizing: border-box; }
+
+/* Welcome logo (coffee cup + download arrow): a little bigger than the line icons */
+.welcome-step:first-child .welcome-icon svg { width: 36px; height: 36px; }
